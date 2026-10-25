@@ -15,3 +15,11 @@ hamstack_kiosk_browser_args:
   - --disable-session-crashed-bubble
   - --disable-infobars
 hamstack_kiosk_extra_packages: []
+# Optional list of URLs opened as tabs. When empty, hamstack_kiosk_url is used.
+hamstack_kiosk_urls: []
+# Seconds between ctrl+Tab tab rotations (xdotool, X11 only). 0 disables rotation.
+hamstack_kiosk_rotate_interval_s: 0
+# Pause rotation until local keyboard/mouse input has been idle this long.
+hamstack_kiosk_rotate_idle_hold_s: 60
+# Raspberry Pi OS only: switch the desktop session to X11 (requires a reboot).
+hamstack_kiosk_force_x11: false

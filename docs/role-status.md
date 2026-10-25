@@ -10,10 +10,10 @@ validation.
 
 ## Implemented or runnable roles
 
-- `common` — baseline packages/directories/timezone/hostname plus shared Docker runtime helper.
+- `common` — baseline packages/directories/timezone/hostname, opt-in device udev rules, plus shared Docker runtime helper.
 - `desktop/hamstack-dev` — Debian-family HamStack development environment around an already-provided source tree.
 - `desktop/hamstack-controller` — lean Ansible conference-control workstation around an already-provided source tree.
-- `desktop/kiosk` — generic Chromium kiosk/autostart/display helper.
+- `desktop/kiosk` — generic Chromium kiosk/autostart/display helper with optional multi-URL tab rotation (X11, xdotool) and an opt-in Raspberry Pi OS X11 switch.
 - `desktop/chirp` — CHIRP-next wheel/pipx workstation install + serial access.
 - `desktop/netlogger` — operator-supplied NetLogger Debian package install.
 - `digital/fldigi` — Debian package install + optional desktop autostart.
@@ -48,6 +48,7 @@ validation.
 - `digital/selfie_station` — headless Picamera2/PySSTV/AIOC service with TX disabled by default.
 - `digital/slowrxd` — headless slowrxd SSTV receive daemon built from a pinned upstream commit, with an optional event hook.
 - `digital/sstv_booth` — FastAPI kiosk booth: slowrxd image display plus pedal-triggered Picamera2 selfie SSTV transmit with cooldown, hourly cap, and RX-busy guardrails; TX disabled by default.
+- `digital/cw_practice` — local CW practice page (sidetone, iambic/straight keying, decoder) with optional Raspberry Pi `gpio-key` Morse-key input.
 - `digital/sstv-rx` — GQRX + HamRadioVillage QSSTV receive appliance with managed Pulse/PipeWire-Pulse audio routing; exercised on the HRV reference receive appliance.
 - `digital/sstv-workstation` — general-purpose HRV QSSTV desktop workstation; detailed per-user audio/PTT preferences remain operator-managed.
 - `voice/allstar` — ASL3 node/radio/HTTP-registration configuration on a preinstalled upstream system; exercised on HRV reference hardware, with audio/radio calibration remaining site-specific.

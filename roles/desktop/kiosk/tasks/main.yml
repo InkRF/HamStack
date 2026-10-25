@@ -8,6 +8,7 @@
           - ansible_facts['os_family'] == 'Debian'
           - hamstack_kiosk_user | length > 0
           - hamstack_kiosk_rotation in ['normal', 'left', 'right', 'inverted']
+          - (hamstack_kiosk_rotate_interval_s | int) >= 0
         fail_msg: >-
           Kiosk currently supports Debian-family desktops and requires a valid
           kiosk user and rotation value.
@@ -16,6 +17,7 @@
       ansible.builtin.apt:
         name: >-
           {{ [hamstack_kiosk_browser_package, 'x11-xserver-utils', 'unclutter']
+             + (['xdotool', 'xprintidle'] if (hamstack_kiosk_rotate_interval_s | int) > 0 else [])
              + hamstack_kiosk_extra_packages }}
         state: present
         update_cache: true
@@ -55,6 +57,21 @@
         group: "{{ _hamstack_kiosk_group.stdout }}"
         mode: '0755'
 
+    - name: Install kiosk tab-rotation helper
+      ansible.builtin.template:
+        src: hamstack-kiosk-rotate.sh.j2
+        dest: "{{ _hamstack_kiosk_home }}/.local/bin/hamstack-kiosk-rotate"
+        owner: "{{ hamstack_kiosk_user }}"
+        group: "{{ _hamstack_kiosk_group.stdout }}"
+        mode: '0755'
+      when: (hamstack_kiosk_rotate_interval_s | int) > 0
+
+    - name: Remove kiosk tab-rotation helper when rotation is disabled
+      ansible.builtin.file:
+        path: "{{ _hamstack_kiosk_home }}/.local/bin/hamstack-kiosk-rotate"
+        state: absent
+      when: (hamstack_kiosk_rotate_interval_s | int) == 0
+
     - name: Configure kiosk XDG autostart
       ansible.builtin.template:
         src: hamstack-kiosk.desktop.j2
@@ -69,3 +86,42 @@
         path: "{{ _hamstack_kiosk_home }}/.config/autostart/hamstack-kiosk.desktop"
         state: absent
       when: not hamstack_kiosk_autostart | bool
+
+    - name: Switch Raspberry Pi OS desktop session to X11
+      when: hamstack_kiosk_force_x11 | bool
+      block:
+        - name: Check for raspi-config
+          ansible.builtin.stat:
+            path: /usr/bin/raspi-config
+          register: _hamstack_kiosk_raspi_config
+
+        - name: Warn that the X11 switch only supports Raspberry Pi OS
+          ansible.builtin.debug:
+            msg: >-
+              hamstack_kiosk_force_x11 is set but raspi-config is not installed;
+              select an X11 session manually for tab rotation.
+          when: not _hamstack_kiosk_raspi_config.stat.exists
+
+        - name: Read current LightDM desktop session
+          ansible.builtin.command:
+            cmd: grep -Eq '^(user|autologin-user)-session=(LXDE-pi-x|rpd-x)$' /etc/lightdm/lightdm.conf
+          register: _hamstack_kiosk_x11_session
+          changed_when: false
+          failed_when: false
+          when: _hamstack_kiosk_raspi_config.stat.exists
+
+        - name: Select the X11 desktop session with raspi-config
+          ansible.builtin.command:
+            cmd: raspi-config nonint do_wayland W1
+          changed_when: true
+          when:
+            - _hamstack_kiosk_raspi_config.stat.exists
+            - _hamstack_kiosk_x11_session.rc != 0
+          register: _hamstack_kiosk_x11_switch
+
+        - name: Report that a reboot is required for the X11 session
+          ansible.builtin.debug:
+            msg: >-
+              The desktop session was switched to X11. Reboot the kiosk for the
+              change (and tab rotation) to take effect; HamStack does not reboot.
+          when: _hamstack_kiosk_x11_switch is changed

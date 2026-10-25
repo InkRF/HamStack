@@ -66,10 +66,11 @@ it owns.
 | SSTV workstation | `digital/sstv-workstation` | Implemented; detailed per-user audio/PTT preferences remain operator-configured |
 | SSTV Selfie Station | `digital/selfie_station` | Implemented; reference workflow exercised; TX disabled by default |
 | SSTV booth (receive display + pedal selfie TX) | `digital/slowrxd`, `digital/sstv_booth` | Implemented; repository and dev-mode tested, not yet hardware validated; TX disabled by default |
+| CW practice page and GPIO Morse key | `digital/cw_practice` | Implemented; not yet hardware validated |
 | GridTracker2 | `visual/gridtracker` | Implemented; reference workstation exercised |
 | OpenWebRX | `visual/openwebrx` | Implemented container deployment |
 | OpenHamClock | `visual/openhamclock` | Implemented container deployment |
-| Generic browser kiosk | `desktop/kiosk` | Implemented |
+| Generic browser kiosk | `desktop/kiosk` | Implemented; optional multi-URL tab rotation (X11) |
 | Conference Blur Deck to Roku/DLNA | `services/blur-deck` | Implemented |
 | Local CONHAM conference RF information | `services/conham-display` | Implemented last-known-good mirror |
 

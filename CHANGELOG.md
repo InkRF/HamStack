@@ -19,6 +19,14 @@ releases when needed to establish a durable public contract.
 - `playbooks/profiles/sstv-booth.yml`, `scripts/sstv-booth-install.sh`
   (no-Ansible fallback), and `scripts/sstv-loopback-test.sh` (snd-aloop
   receive-path test).
+- `digital/cw_practice`: local CW practice page (sidetone, iambic or straight
+  key, live decoder) with optional Raspberry Pi `gpio-key` Morse-key input.
+- `desktop/kiosk`: optional multi-URL tabs with idle-aware `xdotool` tab
+  rotation, and an opt-in Raspberry Pi OS X11 session switch.
+- `common`: opt-in `/etc/udev/rules.d/90-hamstack-devices.rules` generated
+  from `hamstack_devices` (for example a stable `/dev/aioc-ptt` symlink).
+- `playbooks/profiles/aprs-kiosk.yml`: receive-only Graywolf APRS kiosk
+  profile with an optional CW practice day mode.
 
 ### Security
 

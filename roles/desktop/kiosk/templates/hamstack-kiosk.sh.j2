@@ -18,9 +18,14 @@ if command -v unclutter >/dev/null 2>&1; then
   unclutter -idle 0.5 -root >/dev/null 2>&1 &
 fi
 {% endif %}
+{% if (hamstack_kiosk_rotate_interval_s | int) > 0 %}
+"$(dirname "$0")/hamstack-kiosk-rotate" &
+{% endif %}
 
 exec {{ hamstack_kiosk_browser_binary | quote }} \
 {% for arg in hamstack_kiosk_browser_args %}
   {{ arg | quote }} \
 {% endfor %}
-  {{ hamstack_kiosk_url | quote }}
+{% for url in (hamstack_kiosk_urls if hamstack_kiosk_urls | length > 0 else [hamstack_kiosk_url]) %}
+  {{ url | quote }}{{ " \\" if not loop.last else "" }}
+{% endfor %}

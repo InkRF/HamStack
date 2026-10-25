@@ -1,0 +1,21 @@
+---
+- name: Configure HamStack APRS kiosk station profile
+  hosts: "{{ hamstack_profile_hosts | default('aprs_kiosk') }}"
+  become: true
+  roles:
+    - role: common
+    - role: packet/graywolf
+      vars:
+        hamstack_graywolf_enabled: true
+    - role: packet/aprs
+      vars:
+        hamstack_aprs_enabled: true
+      when: hamstack_profile_aprs_kiosk_aprs | default(true) | bool
+    - role: digital/cw_practice
+      vars:
+        hamstack_cw_practice_enabled: true
+      when: hamstack_profile_aprs_kiosk_cw | default(false) | bool
+    - role: desktop/kiosk
+      vars:
+        hamstack_kiosk_enabled: true
+      when: hamstack_profile_aprs_kiosk_kiosk | default(true) | bool

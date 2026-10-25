@@ -1,0 +1,27 @@
+#!/bin/sh
+# Managed by HamStack (desktop/kiosk). Rotates Chromium kiosk tabs with
+# ctrl+Tab every {{ hamstack_kiosk_rotate_interval_s | int }} s, pausing while someone is using
+# the keyboard or mouse. Requires an X11 session (xdotool and xprintidle).
+interval={{ hamstack_kiosk_rotate_interval_s | int }}
+hold_ms={{ (hamstack_kiosk_rotate_idle_hold_s | int) * 1000 }}
+
+if [ -z "${DISPLAY:-}" ]; then
+  echo "hamstack-kiosk-rotate: no X11 DISPLAY; tab rotation disabled" >&2
+  exit 0
+fi
+
+last_key=$(date +%s)
+while :; do
+  sleep "$interval"
+  now=$(date +%s)
+  idle=$(xprintidle 2>/dev/null || echo 2147483647)
+  # Our own synthetic ctrl+Tab also resets the X idle timer, so only treat
+  # input that happened after the last rotation as a person at the kiosk.
+  since_rotation_ms=$(( (now - last_key) * 1000 ))
+  if [ "$idle" -lt "$hold_ms" ] && [ "$idle" -lt $(( since_rotation_ms - 2000 )) ]; then
+    continue
+  fi
+  xdotool search --onlyvisible --class chromium windowactivate --sync \
+    key --clearmodifiers ctrl+Tab >/dev/null 2>&1 || true
+  last_key=$(date +%s)
+done

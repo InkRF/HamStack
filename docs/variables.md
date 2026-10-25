@@ -32,6 +32,7 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_common_extra_packages` | `[]` | Additional site- or host-specific packages to install with the baseline. |
 | `hamstack_common_manage_directories` | `true` | Create the HamStack config/data/cache/log directories. |
 | `hamstack_common_manage_packages` | `true` | Install and maintain the baseline package set. |
+| `hamstack_common_manage_udev_rules` | `false` | Render `/etc/udev/rules.d/90-hamstack-devices.rules` from `hamstack_devices` entries that define a `udev` mapping. |
 | `hamstack_common_packages` | `[curl, git, htop, jq, rsync, tmux, unzip, vim, wget]` | Baseline packages expected on HamStack-managed nodes. |
 | `hamstack_config_dir` | `/etc/hamstack` | Directory for HamStack-owned configuration and generated metadata. |
 | `hamstack_country_code` | `US` | Two-letter country code used by roles that need regional defaults. |
@@ -110,10 +111,14 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_kiosk_disable_blanking` | `true` | Configuration value for kiosk disable blanking; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_enabled` | `false` | Enable the desktop/kiosk role/capability. |
 | `hamstack_kiosk_extra_packages` | `[]` | Configuration value for kiosk extra packages; see the desktop/kiosk role README for operational context. |
+| `hamstack_kiosk_force_x11` | `false` | Configuration value for kiosk force x11; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_hide_cursor` | `true` | Configuration value for kiosk hide cursor; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_output` | `` | Configuration value for kiosk output; see the desktop/kiosk role README for operational context. |
+| `hamstack_kiosk_rotate_idle_hold_s` | `60` | Configuration value for kiosk rotate idle hold s; see the desktop/kiosk role README for operational context. |
+| `hamstack_kiosk_rotate_interval_s` | `0` | Configuration value for kiosk rotate interval s; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_rotation` | `normal` | Configuration value for kiosk rotation; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_url` | `https://127.0.0.1/` | Configuration value for kiosk url; see the desktop/kiosk role README for operational context. |
+| `hamstack_kiosk_urls` | `[]` | Configuration value for kiosk urls; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_user` | `{{ hamstack_operator_user \| default('') }}` | Configuration value for kiosk user; see the desktop/kiosk role README for operational context. |
 
 ## `desktop/netlogger`
@@ -128,6 +133,25 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_netlogger_package_src` | `` | Configuration value for netlogger package src; see the desktop/netlogger role README for operational context. |
 | `hamstack_netlogger_package_url` | `` | Explicit upstream package URL override. |
 | `hamstack_netlogger_user` | `{{ hamstack_operator_user \| default('') }}` | Configuration value for netlogger user; see the desktop/netlogger role README for operational context. |
+
+## `digital/cw_practice`
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `hamstack_cw_practice_boot_config` | `/boot/firmware/config.txt` | Raspberry Pi firmware configuration file. |
+| `hamstack_cw_practice_callsign` | `{{ hamstack_callsign \| default('N0CALL') }}` | Callsign used in the page's suggested practice text. |
+| `hamstack_cw_practice_dah_key` | `ControlRight` | Browser `KeyboardEvent.code` treated as the dah paddle. |
+| `hamstack_cw_practice_dit_key` | `ControlLeft` | Browser `KeyboardEvent.code` treated as the dit paddle or straight key. |
+| `hamstack_cw_practice_enabled` | `false` | Install the CW practice page. |
+| `hamstack_cw_practice_install_dir` | `/opt/hamstack/cw_practice` | Static page directory, opened as `file://<dir>/index.html`. |
+| `hamstack_cw_practice_key_mode` | `iambic` | Default key mode: `iambic` (paddles) or `straight`. |
+| `hamstack_cw_practice_manage_gpio_key` | `false` | Manage `gpio-key` overlays for a Morse key in the Raspberry Pi boot configuration (reboot required). |
+| `hamstack_cw_practice_ring_gpio` | `27` | GPIO wired to the key's ring contact (active low, pull-up). |
+| `hamstack_cw_practice_ring_keycode` | `97` | Linux keycode emitted by the ring contact (`KEY_RIGHTCTRL`). |
+| `hamstack_cw_practice_tip_gpio` | `17` | GPIO wired to the key's tip contact (active low, pull-up). |
+| `hamstack_cw_practice_tip_keycode` | `29` | Linux keycode emitted by the tip contact (`KEY_LEFTCTRL`). |
+| `hamstack_cw_practice_tone_hz` | `600` | Sidetone pitch. |
+| `hamstack_cw_practice_wpm` | `15` | Default keyer speed (5-40 WPM). |
 
 ## `digital/fldigi`
 

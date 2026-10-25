@@ -43,3 +43,45 @@
   community.general.timezone:
     name: "{{ hamstack_timezone }}"
   when: hamstack_manage_timezone | bool
+
+- name: Manage HamStack device udev rules
+  when: hamstack_common_manage_udev_rules | bool
+  block:
+    - name: Select devices with udev mappings
+      ansible.builtin.set_fact:
+        _hamstack_common_udev_devices: >-
+          {{ hamstack_devices | dict2items | selectattr('value.udev', 'defined') | list }}
+
+    - name: Validate device udev mappings
+      ansible.builtin.assert:
+        that:
+          - item.value.udev.symlink | default('') is match('^[A-Za-z0-9._/-]+$')
+          - item.value.udev.subsystem | default('hidraw') is match('^[a-z0-9_]+$')
+          - item.value.match.usb_vendor_id | default('') is match('^[0-9a-fA-F]{4}$')
+          - item.value.match.usb_product_id | default('') is match('^[0-9a-fA-F]{4}$')
+          - item.value.match.usb_serial | default('') is match('^[A-Za-z0-9._-]*$')
+          - item.value.udev.group | default('audio') is match('^[a-z_][a-z0-9_-]*$')
+          - (item.value.udev.mode | default('0660') | string) is match('^0[0-7]{3}$')
+        fail_msg: >-
+          Device {{ item.key }} needs udev.symlink plus four-digit hex
+          match.usb_vendor_id and match.usb_product_id to generate a udev rule.
+      loop: "{{ _hamstack_common_udev_devices }}"
+      loop_control:
+        label: "{{ item.key }}"
+
+    - name: Install HamStack device udev rules
+      ansible.builtin.template:
+        src: 90-hamstack-devices.rules.j2
+        dest: /etc/udev/rules.d/90-hamstack-devices.rules
+        owner: root
+        group: root
+        mode: "0644"
+      when: _hamstack_common_udev_devices | length > 0
+      notify: Reload HamStack udev rules
+
+    - name: Remove HamStack device udev rules when no device defines one
+      ansible.builtin.file:
+        path: /etc/udev/rules.d/90-hamstack-devices.rules
+        state: absent
+      when: _hamstack_common_udev_devices | length == 0
+      notify: Reload HamStack udev rules

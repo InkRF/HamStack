@@ -172,6 +172,27 @@ A radio definition intentionally does **not** own operating frequency, packet mo
 | `hamstack_common_extra_packages` | list[string] | `[]` | role | Additional site- or host-specific packages to install with the baseline. |
 | `hamstack_common_apt_cache_valid_time` | integer | `3600` | role | Seconds an existing apt cache is considered fresh on Debian-family systems. |
 | `hamstack_common_manage_directories` | boolean | `true` | role | Create the HamStack config/data/cache/log directories. |
+| `hamstack_common_manage_udev_rules` | boolean | `false` | role | Render `/etc/udev/rules.d/90-hamstack-devices.rules` from `hamstack_devices` entries that define a `udev` mapping. |
+
+When udev management is enabled, a device such as the AIOC can request a stable
+symlink. The rule matches `match.usb_vendor_id`/`usb_product_id` (and
+`usb_serial` when set):
+
+```yaml
+hamstack_devices:
+  aioc_main:
+    type: aioc
+    match:
+      usb_vendor_id: "1209"
+      usb_product_id: "7388"
+    udev:
+      subsystem: hidraw      # default
+      symlink: aioc-ptt      # creates /dev/aioc-ptt
+      group: audio           # default
+      mode: "0660"           # default
+```
+
+HamStack owns that rules file; put operator rules in a separate file.
 
 
 ### Digital
@@ -758,6 +779,29 @@ sends pedal-triggered selfies as SSTV. Transmission is disabled by default.
 The booth references shared AIOC and pedal resources from `hamstack_devices`; it
 does not own those devices. It does not set radio frequencies.
 
+<a id="role-cw-practice"></a>
+#### `cw_practice`
+
+Local CW practice page (sidetone, iambic or straight key, live decoder) and
+optional Raspberry Pi GPIO Morse-key input. Nothing is transmitted.
+
+| Variable | Type | Default | Scope | Purpose |
+| --- | --- | --- | --- | --- |
+| `hamstack_cw_practice_enabled` | boolean | `false` | role | Install the CW practice page. |
+| `hamstack_cw_practice_install_dir` | path | `/opt/hamstack/cw_practice` | role | Static page directory, opened as `file://<dir>/index.html`. |
+| `hamstack_cw_practice_callsign` | string | site callsign | role | Callsign used in the page's suggested practice text. |
+| `hamstack_cw_practice_key_mode` | string | `iambic` | role | Default key mode: `iambic` (paddles) or `straight`. |
+| `hamstack_cw_practice_wpm` | integer | `15` | role | Default keyer speed (5-40 WPM). |
+| `hamstack_cw_practice_tone_hz` | integer | `600` | role | Sidetone pitch. |
+| `hamstack_cw_practice_dit_key` | string | `ControlLeft` | role | Browser `KeyboardEvent.code` treated as the dit paddle or straight key. |
+| `hamstack_cw_practice_dah_key` | string | `ControlRight` | role | Browser `KeyboardEvent.code` treated as the dah paddle. |
+| `hamstack_cw_practice_manage_gpio_key` | boolean | `false` | role | Manage `gpio-key` overlays for a Morse key in the Raspberry Pi boot configuration (reboot required). |
+| `hamstack_cw_practice_boot_config` | path | `/boot/firmware/config.txt` | role | Raspberry Pi firmware configuration file. |
+| `hamstack_cw_practice_tip_gpio` | integer | `17` | role | GPIO wired to the key's tip contact (active low, pull-up). |
+| `hamstack_cw_practice_ring_gpio` | integer | `27` | role | GPIO wired to the key's ring contact (active low, pull-up). |
+| `hamstack_cw_practice_tip_keycode` | integer | `29` | role | Linux keycode emitted by the tip contact (`KEY_LEFTCTRL`). |
+| `hamstack_cw_practice_ring_keycode` | integer | `97` | role | Linux keycode emitted by the ring contact (`KEY_RIGHTCTRL`). |
+
 ### Voice
 
 <a id="role-allstar"></a>
@@ -929,7 +973,12 @@ and network appliances.
   an already-provided HamStack source tree.
 - `desktop/hamstack-controller` prepares a lean conference control station for
   running Ansible playbooks.
-- `desktop/kiosk` launches a configurable Chromium kiosk.
+- `desktop/kiosk` launches a configurable Chromium kiosk. `hamstack_kiosk_urls`
+  opens several pages as tabs, and `hamstack_kiosk_rotate_interval_s` rotates
+  them with `xdotool` (X11 only), pausing for `hamstack_kiosk_rotate_idle_hold_s`
+  after local keyboard or mouse input. `hamstack_kiosk_force_x11` switches a
+  Raspberry Pi OS desktop to X11 with `raspi-config` and reports that a reboot is
+  needed.
 - `desktop/chirp` installs CHIRP-next for radio programming;
   `hamstack_chirp_wheel_checksum` verifies the wheel path.
 - `desktop/netlogger` installs an operator-supplied NetLogger Debian package;

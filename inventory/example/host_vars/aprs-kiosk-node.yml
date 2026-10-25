@@ -1,0 +1,99 @@
+---
+# Example receive-only APRS kiosk station (Raspberry Pi 4B + AIOC + radio on
+# the local APRS frequency), with an optional CW practice day mode. Deploy with:
+#
+#   ansible-playbook -i inventory/local/hosts.yml playbooks/profiles/aprs-kiosk.yml
+#
+# Copy to inventory/local and replace the example values. Put the Graywolf
+# management password in Vault as vault_hamstack_graywolf_password. Tune the
+# radio's frequency on the radio itself; HamStack does not set it.
+
+hamstack_manage_hostname: false
+hamstack_hostname: aprs-kiosk-node
+
+# Desktop login that runs the Chromium kiosk (desktop autologin is operator-managed).
+hamstack_operator_user: operator
+
+# Stable /dev/aioc-ptt symlink for the AIOC's CM108-compatible HID interface.
+hamstack_common_manage_udev_rules: true
+hamstack_devices:
+  aioc_main:
+    type: aioc
+    description: AIOC on the APRS receiver
+    match:
+      usb_vendor_id: "1209"
+      usb_product_id: "7388"
+      usb_serial: ""
+    udev:
+      subsystem: hidraw
+      symlink: aioc-ptt
+      # Graywolf's service account must be able to open the device.
+      group: audio
+      mode: "0660"
+    endpoints:
+      serial: ""
+      audio_capture: plughw:CARD=AllInOneCable,DEV=0
+      audio_playback: plughw:CARD=AllInOneCable,DEV=0
+    options: {}
+
+# Graywolf modem/TNC on the AIOC.
+hamstack_graywolf_manage_api: true
+hamstack_graywolf_audio_devices:
+  - name: aioc_rx
+    direction: input
+    source_type: soundcard
+    device_path: plughw:CARD=AllInOneCable,DEV=0
+  - name: aioc_tx
+    direction: output
+    source_type: soundcard
+    device_path: plughw:CARD=AllInOneCable,DEV=0
+hamstack_graywolf_channels:
+  - name: aprs_vhf
+    mode: aprs
+    input_device: aioc_rx
+    output_device: aioc_tx
+    modem: afsk1200
+    ptt:
+      method: cm108
+      device_path: /dev/aioc-ptt
+
+# Receive-only APRS policy: simulation mode on, no beacon, no digipeating, and
+# no APRS-IS-to-RF gating. This is configuration intent, not a hardware TX
+# interlock; leave the radio's TX power at minimum or use a receive-only radio
+# if that matters for the deployment.
+hamstack_aprs_ssid: 10
+# Graywolf numeric ID of aprs_vhf (1 on a fresh Graywolf install); check the
+# Graywolf channel list before relying on it.
+hamstack_aprs_graywolf_channel_id: 1
+hamstack_aprs_simulation_mode: true
+hamstack_aprs_beacon_enabled: false
+hamstack_aprs_digipeater_enabled: false
+hamstack_aprs_igate_is_to_rf: false
+# Optional RF-to-APRS-IS iGate: set to true to forward heard packets to APRS-IS.
+hamstack_aprs_igate_enabled: false
+hamstack_aprs_igate_rf_to_is: true
+
+# Kiosk: rotate between the Graywolf UI and other pages. The Graywolf UI needs
+# one login in the kiosk's Chromium profile; the session cookie persists.
+hamstack_kiosk_force_x11: true
+hamstack_kiosk_rotate_interval_s: 30
+hamstack_kiosk_rotate_idle_hold_s: 60
+hamstack_kiosk_urls:
+  - http://127.0.0.1:8080/
+  # CW day: enable hamstack_profile_aprs_kiosk_cw and keep this page in the list.
+  - file:///opt/hamstack/cw_practice/index.html
+  # Optional Internet map of nearby stations; replace with your own view.
+  # - https://aprs.fi/
+hamstack_kiosk_browser_args:
+  - --kiosk
+  - --no-first-run
+  - --disable-session-crashed-bubble
+  - --disable-infobars
+  # Lets the CW practice sidetone play without a click.
+  - --autoplay-policy=no-user-gesture-required
+
+# CW practice day mode: Morse key on GPIO (tip -> GPIO17, ring -> GPIO27,
+# sleeve -> GND) mapped to left/right Ctrl. Reboot after the first run.
+hamstack_profile_aprs_kiosk_cw: true
+hamstack_cw_practice_manage_gpio_key: true
+hamstack_cw_practice_key_mode: iambic

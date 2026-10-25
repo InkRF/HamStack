@@ -35,3 +35,6 @@ hamstack_common_packages:
 hamstack_common_extra_packages: []
 hamstack_common_apt_cache_valid_time: 3600
 hamstack_common_manage_directories: true
+# Render /etc/udev/rules.d/90-hamstack-devices.rules from hamstack_devices
+# entries that define `udev: {symlink, subsystem, group, mode}`.
+hamstack_common_manage_udev_rules: false

@@ -1,0 +1,10 @@
+# Managed by HamStack (common). Generated from hamstack_devices entries that
+# define a `udev` mapping. Local changes are overwritten; put operator rules
+# in a separate file under /etc/udev/rules.d/.
+{% for item in _hamstack_common_udev_devices %}
+{%   set dev = item.value %}
+{%   set match = dev.match | default({}) %}
+
+# {{ item.key }}{{ (': ' ~ dev.description) if dev.description | default('') | length > 0 else '' }}
+SUBSYSTEM=="{{ dev.udev.subsystem | default('hidraw') }}", ATTRS{idVendor}=="{{ match.usb_vendor_id }}", ATTRS{idProduct}=="{{ match.usb_product_id }}"{% if match.usb_serial | default('') | length > 0 %}, ATTRS{serial}=="{{ match.usb_serial }}"{% endif %}, SYMLINK+="{{ dev.udev.symlink }}", GROUP="{{ dev.udev.group | default('audio') }}", MODE="{{ dev.udev.mode | default('0660') }}"
+{% endfor %}

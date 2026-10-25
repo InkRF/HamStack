@@ -1,0 +1,5 @@
+---
+- name: Reload HamStack udev rules
+  ansible.builtin.shell:
+    cmd: udevadm control --reload-rules && udevadm trigger --action=change
+  changed_when: true

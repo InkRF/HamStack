@@ -1,0 +1,9 @@
+// Managed by HamStack (digital/cw_practice). Local changes are overwritten.
+window.HAMSTACK_CW = {{ {
+  'callsign': hamstack_cw_practice_callsign,
+  'mode': hamstack_cw_practice_key_mode,
+  'wpm': hamstack_cw_practice_wpm | int,
+  'toneHz': hamstack_cw_practice_tone_hz | int,
+  'ditKey': hamstack_cw_practice_dit_key,
+  'dahKey': hamstack_cw_practice_dah_key,
+} | to_json }};

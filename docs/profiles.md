@@ -79,3 +79,23 @@ slowrxd hook and the kiosk at the booth's local port
 to skip the kiosk, or `hamstack_profile_sstv_booth_hook_url` to send hook events
 elsewhere. Transmission stays disabled until `hamstack_sstv_booth_tx_enabled` is
 set. See `inventory/example/host_vars/sstv-booth-node.yml`.
+
+## APRS kiosk
+
+`playbooks/profiles/aprs-kiosk.yml` composes `packet/graywolf`, `packet/aprs`,
+optional `digital/cw_practice`, and `desktop/kiosk` for a receive-only APRS
+display station. Graywolf decodes AFSK1200 from an AIOC. The example host_vars
+keep APRS simulation mode on with beaconing, digipeating, and IS-to-RF gating
+off, and leave the RF-to-IS iGate as an opt-in. The kiosk can rotate between the
+Graywolf UI and other pages (`hamstack_kiosk_urls`,
+`hamstack_kiosk_rotate_interval_s`; X11 required).
+
+Profile toggles:
+
+```yaml
+hamstack_profile_aprs_kiosk_aprs: true    # packet/aprs policy on top of Graywolf
+hamstack_profile_aprs_kiosk_cw: false     # CW practice page and GPIO Morse key
+hamstack_profile_aprs_kiosk_kiosk: true   # Chromium kiosk
+```
+
+See `inventory/example/host_vars/aprs-kiosk-node.yml`.
