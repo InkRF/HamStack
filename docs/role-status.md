@@ -46,6 +46,8 @@ validation.
 - `visual/openhamclock` — official container behind Caddy internal-CA HTTPS; plaintext app port remains container-private.
 - `visual/openwebrx` — OpenWebRX container behind Caddy internal-CA HTTPS; explicit SDR device mapping.
 - `digital/selfie_station` — headless Picamera2/PySSTV/AIOC service with TX disabled by default.
+- `digital/slowrxd` — headless slowrxd SSTV receive daemon built from a pinned upstream commit, with an optional event hook.
+- `digital/sstv_booth` — FastAPI kiosk booth: slowrxd image display plus pedal-triggered Picamera2 selfie SSTV transmit with cooldown, hourly cap, and RX-busy guardrails; TX disabled by default.
 - `digital/sstv-rx` — GQRX + HamRadioVillage QSSTV receive appliance with managed Pulse/PipeWire-Pulse audio routing; exercised on the HRV reference receive appliance.
 - `digital/sstv-workstation` — general-purpose HRV QSSTV desktop workstation; detailed per-user audio/PTT preferences remain operator-managed.
 - `voice/allstar` — ASL3 node/radio/HTTP-registration configuration on a preinstalled upstream system; exercised on HRV reference hardware, with audio/radio calibration remaining site-specific.

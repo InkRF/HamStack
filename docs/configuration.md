@@ -684,6 +684,80 @@ appliance and the camera/trigger-oriented Selfie Station.
 Live reference-hardware RX/TX validation and detailed QSSTV audio/PTT preference
 automation remain operator-owned until a portable implementation is validated.
 
+<a id="role-slowrxd"></a>
+#### `slowrxd`
+
+Headless SSTV receive daemon built from a pinned commit of the upstream
+`slowrx-daemon` branch. Receive-only; it never keys a radio.
+
+| Variable | Type | Default | Scope | Purpose |
+| --- | --- | --- | --- | --- |
+| `hamstack_slowrxd_enabled` | boolean | `false` | role | Build, install, and run slowrxd. |
+| `hamstack_slowrxd_repo` | URL | `https://github.com/sjlongland/slowrx.git` | role | slowrx source repository. |
+| `hamstack_slowrxd_version` | git commit | `c94327ae40ab970b0bea20ebb378d71f8e69b98a` | role | Pinned commit on the `slowrx-daemon` branch; changing it triggers a rebuild. |
+| `hamstack_slowrxd_source_dir` | path | `/opt/hamstack/slowrx-source` | role | Source checkout and build tree. |
+| `hamstack_slowrxd_install_path` | path | `/usr/local/bin/slowrxd` | role | Installed daemon binary. |
+| `hamstack_slowrxd_hook_path` | path | `/usr/local/libexec/hamstack/slowrxd-hook` | role | Event hook script installed when a hook URL is set. |
+| `hamstack_slowrxd_user` | string | `hamstack-slowrxd` | role | Unprivileged service account. |
+| `hamstack_slowrxd_group` | string | `hamstack-slowrxd` | role | Primary group of the service account. |
+| `hamstack_slowrxd_manage_user` | boolean | `true` | role | Create the service account/group as a nologin system user. |
+| `hamstack_slowrxd_user_groups` | list[string] | `audio` | role | Supplementary groups granting ALSA capture access. |
+| `hamstack_slowrxd_device` | string | `plughw:CARD=AllInOneCable,DEV=0` | role | ALSA capture PCM carrying receiver audio. |
+| `hamstack_slowrxd_sample_rate` | integer | `48000` | role | Capture sample rate (slowrxd clamps above 48000). |
+| `hamstack_slowrxd_channel` | string | `l` | role | Capture channel: `l`, `r`, or `m` (mono). |
+| `hamstack_slowrxd_output_dir` | path | `<hamstack_data_dir>/slowrxd` | role | Directory for in-progress and final images, logs, and audio dumps. |
+| `hamstack_slowrxd_hook_url` | URL | `""` | role | Endpoint that receives a JSON POST per slowrxd event; empty disables the hook. |
+| `hamstack_slowrxd_audio_retention` | duration | `1d` | role | systemd-tmpfiles age for per-image `.au` audio dumps. |
+| `hamstack_slowrxd_extra_args` | list[string] | `[]` | role | Additional slowrxd arguments, such as `-F` or `-S`. |
+| `hamstack_slowrxd_autostart` | boolean | `true` | role | Enable and start the slowrxd service. |
+
+<a id="role-sstv-booth"></a>
+#### `sstv_booth`
+
+Interactive booth station: shows slowrxd receptions on a local kiosk page and
+sends pedal-triggered selfies as SSTV. Transmission is disabled by default.
+
+| Variable | Type | Default | Scope | Purpose |
+| --- | --- | --- | --- | --- |
+| `hamstack_sstv_booth_enabled` | boolean | `false` | role | Enable the SSTV booth service. |
+| `hamstack_sstv_booth_user` | string | `hamstack-sstv-booth` | role | Dedicated unprivileged service account. |
+| `hamstack_sstv_booth_group` | string | `hamstack-sstv-booth` | role | Primary group of the service account. |
+| `hamstack_sstv_booth_manage_user` | boolean | `true` | role | Create the service account/group as a nologin system user. |
+| `hamstack_sstv_booth_user_groups` | list[string] | `audio`, `dialout`, `video`, `input` | role | Supplementary groups for AIOC audio/serial, camera, and pedal access. |
+| `hamstack_sstv_booth_install_dir` | path | `/opt/hamstack/sstv_booth` | role | Root-owned application directory. |
+| `hamstack_sstv_booth_venv_dir` | path | `/opt/hamstack/sstv_booth/venv` | role | Python virtual environment (system site packages plus PySSTV). |
+| `hamstack_sstv_booth_data_dir` | path | `<hamstack_data_dir>/sstv_booth` | role | Gallery, work files, and TX history. |
+| `hamstack_sstv_booth_rx_dir` | path | `hamstack_slowrxd_output_dir` | role | slowrxd output directory read by the booth. |
+| `hamstack_sstv_booth_listen_address` | address | `127.0.0.1` | role | HTTP listen address; keep it local to the kiosk. |
+| `hamstack_sstv_booth_http_port` | integer | `8454` | role | HTTP listener for the kiosk page and slowrxd hook. |
+| `hamstack_sstv_booth_callsign` | string | site callsign | role | Callsign overlaid on every image and sent as the CW ID. |
+| `hamstack_sstv_booth_sstv_mode` | string | `Robot36` | role | Transmit mode: `Robot36`, `MartinM1`, or `ScottieS1`. |
+| `hamstack_sstv_booth_blurb_mode` | string | `fixed` | role | Top overlay line: `fixed`, `random`, or `none`. |
+| `hamstack_sstv_booth_blurb_text` | string | `hamstack_event_name` | role | Text used by `fixed` blurb mode. |
+| `hamstack_sstv_booth_blurb_list` | list[string] | `[]` | role | Candidates for `random` blurb mode. |
+| `hamstack_sstv_booth_tx_enabled` | boolean | `false` | role | Key the AIOC and transmit. When false, selfies run as on-screen dry runs. |
+| `hamstack_sstv_booth_tx_cooldown_s` | number | `60` | role | Minimum seconds between the end of one transmission and the next selfie. |
+| `hamstack_sstv_booth_max_tx_per_hour` | integer | `20` | role | Sliding one-hour cap on transmissions, persisted across restarts. |
+| `hamstack_sstv_booth_rx_ignore_tail_s` | number | `3` | role | Seconds after the booth's own TX during which receive events are ignored. |
+| `hamstack_sstv_booth_countdown_s` | number | `5` | role | Countdown over the live preview before capture. |
+| `hamstack_sstv_booth_review_s` | number | `3` | role | Review time during which the pedal cancels the transmission. |
+| `hamstack_sstv_booth_interface` | resource name | `""` | role | AIOC device from `hamstack_devices` (`serial` and `audio_playback` endpoints); empty auto-detects. |
+| `hamstack_sstv_booth_trigger_device` | resource name | `""` | role | Pedal device from `hamstack_devices` (`hid` endpoint). |
+| `hamstack_sstv_booth_trigger_key` | string | `KEY_B` | role | Linux input-event key emitted by the pedal. |
+| `hamstack_sstv_booth_trigger_fallback_device` | path | `/dev/input/by-id/usb-PCsensor_FootSwitch-event-kbd` | role | Pedal event device used when no `hid` endpoint is supplied. |
+| `hamstack_sstv_booth_sample_rate` | integer | `48000` | role | Generated/transmitted audio sample rate. |
+| `hamstack_sstv_booth_cw_enabled` | boolean | `true` | role | Prefix transmissions with a software-generated CW callsign ID. |
+| `hamstack_sstv_booth_cw_wpm` | integer | `15` | role | CW ID speed. |
+| `hamstack_sstv_booth_cw_tone_hz` | number | `700.0` | role | CW ID tone frequency. |
+| `hamstack_sstv_booth_ptt_lead_seconds` | number | `0.30` | role | Delay after keying PTT before audio playback. |
+| `hamstack_sstv_booth_ptt_tail_seconds` | number | `0.20` | role | Delay after playback before unkeying PTT. |
+| `hamstack_sstv_booth_camera_width` | integer | `1280` | role | Capture stream width. |
+| `hamstack_sstv_booth_camera_height` | integer | `720` | role | Capture stream height. |
+| `hamstack_sstv_booth_autostart` | boolean | `true` | role | Enable and start the booth service. |
+
+The booth references shared AIOC and pedal resources from `hamstack_devices`; it
+does not own those devices. It does not set radio frequencies.
+
 ### Voice
 
 <a id="role-allstar"></a>

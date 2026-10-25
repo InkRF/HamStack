@@ -1,0 +1,28 @@
+---
+# Public configuration defaults for the slowrxd HamStack role.
+# See docs/configuration.md for the configuration contract.
+hamstack_slowrxd_enabled: false
+hamstack_slowrxd_repo: https://github.com/sjlongland/slowrx.git
+# Pinned commit on the upstream slowrx-daemon branch. Change deliberately.
+hamstack_slowrxd_version: c94327ae40ab970b0bea20ebb378d71f8e69b98a
+hamstack_slowrxd_source_dir: /opt/hamstack/slowrx-source
+hamstack_slowrxd_install_path: /usr/local/bin/slowrxd
+hamstack_slowrxd_hook_path: /usr/local/libexec/hamstack/slowrxd-hook
+# Dedicated unprivileged service account with ALSA capture access.
+hamstack_slowrxd_user: hamstack-slowrxd
+hamstack_slowrxd_group: hamstack-slowrxd
+hamstack_slowrxd_manage_user: true
+hamstack_slowrxd_user_groups:
+  - audio
+# ALSA capture PCM. The AIOC enumerates as card "AllInOneCable".
+hamstack_slowrxd_device: plughw:CARD=AllInOneCable,DEV=0
+hamstack_slowrxd_sample_rate: 48000
+# slowrxd channel selector: l (left), r (right), or m (mono).
+hamstack_slowrxd_channel: l
+hamstack_slowrxd_output_dir: '{{ (hamstack_data_dir | default(''/var/lib/hamstack'')) ~ ''/slowrxd'' }}'
+# URL that receives a JSON POST for each slowrxd event. Empty disables the hook.
+hamstack_slowrxd_hook_url: ''
+# systemd-tmpfiles age for slowrxd's per-image .au audio dumps.
+hamstack_slowrxd_audio_retention: 1d
+hamstack_slowrxd_extra_args: []
+hamstack_slowrxd_autostart: true

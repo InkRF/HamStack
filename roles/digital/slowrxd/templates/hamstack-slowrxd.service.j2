@@ -1,0 +1,27 @@
+[Unit]
+Description=HamStack slowrxd SSTV receive daemon
+After=network.target sound.target
+
+[Service]
+Type=simple
+User={{ hamstack_slowrxd_user }}
+Group={{ hamstack_slowrxd_group }}
+SupplementaryGroups={{ hamstack_slowrxd_user_groups | join(' ') }}
+EnvironmentFile=/etc/default/hamstack-slowrxd
+WorkingDirectory={{ hamstack_slowrxd_output_dir }}
+# slowrxd resolves -I/-L/-A paths against -d only when -d is parsed first.
+ExecStart={{ hamstack_slowrxd_install_path }} -d ${SLOWRXD_OUTPUT_DIR} -p ${SLOWRXD_DEVICE} -r ${SLOWRXD_SAMPLE_RATE} -c ${SLOWRXD_CHANNEL} $SLOWRXD_HOOK_ARGS $SLOWRXD_EXTRA_ARGS
+# Keep retrying while the AIOC is unplugged or still enumerating.
+Restart=always
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+ReadWritePaths={{ hamstack_slowrxd_output_dir }}
+
+[Install]
+WantedBy=multi-user.target

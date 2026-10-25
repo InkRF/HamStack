@@ -1,0 +1,12 @@
+---
+- name: Restart slowrxd
+  ansible.builtin.systemd:
+    name: hamstack-slowrxd
+    state: restarted
+    daemon_reload: true
+  when: hamstack_slowrxd_autostart | bool
+
+- name: Apply slowrxd tmpfiles rule
+  ansible.builtin.command:
+    cmd: systemd-tmpfiles --create /etc/tmpfiles.d/hamstack-slowrxd.conf
+  changed_when: true

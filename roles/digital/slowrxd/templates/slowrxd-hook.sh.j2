@@ -1,0 +1,25 @@
+#!/bin/sh
+# Managed by HamStack (digital/slowrxd). Local changes are overwritten.
+#
+# slowrxd runs this hook as: hook EVENT IMAGE LOG [AUDIO] and waits for it to
+# exit, so the notification POST is backgrounded and the hook returns at once.
+# Only the event name and image basename are forwarded; the receiver reads
+# images from its own configured directory.
+event="${1:-}"
+image="$(basename -- "${2:-}")"
+
+case "$event" in
+  VIS_DETECT|IMAGE_REFRESHED|RECEIVE_END) ;;
+  *) exit 0 ;;
+esac
+
+case "$image" in
+  *[!A-Za-z0-9._-]*) image="" ;;
+esac
+
+curl -fsS -m 3 -o /dev/null \
+  -H 'Content-Type: application/json' \
+  -d "{\"event\":\"${event}\",\"image\":\"${image}\"}" \
+  {{ hamstack_slowrxd_hook_url | quote }} >/dev/null 2>&1 &
+
+exit 0

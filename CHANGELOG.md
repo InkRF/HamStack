@@ -8,6 +8,18 @@ releases when needed to establish a durable public contract.
 
 ## [Unreleased]
 
+### Added
+
+- `digital/slowrxd`: builds the upstream `slowrx-daemon` branch at a pinned commit
+  and runs `slowrxd` as a sandboxed receive-only service with an event hook.
+- `digital/sstv_booth`: interactive SSTV booth with a local kiosk page (SSE
+  state, MJPEG camera preview, RX gallery) and pedal-triggered selfie SSTV
+  transmission. TX is disabled by default and guarded by a cooldown, an hourly
+  cap, and an RX-busy check.
+- `playbooks/profiles/sstv-booth.yml`, `scripts/sstv-booth-install.sh`
+  (no-Ansible fallback), and `scripts/sstv-loopback-test.sh` (snd-aloop
+  receive-path test).
+
 ### Security
 
 - `packet/winlink`: the Pat package is downloaded into the root-owned HamStack

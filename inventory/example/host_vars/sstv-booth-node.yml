@@ -1,0 +1,58 @@
+---
+# Example SSTV booth station (Raspberry Pi 4B + Camera Module 3 + USB foot
+# pedal + AIOC). Deploy with:
+#
+#   ansible-playbook -i inventory/local/hosts.yml playbooks/profiles/sstv-booth.yml
+#
+# Copy to inventory/local and replace the example values. Tune the radio's
+# frequency and audio levels on the radio itself; HamStack does not set them.
+
+hamstack_manage_hostname: false
+hamstack_hostname: sstv-booth-node
+
+# Desktop login that runs the Chromium kiosk (desktop autologin is operator-managed).
+hamstack_operator_user: operator
+
+hamstack_devices:
+  aioc_main:
+    type: aioc
+    description: AIOC on the booth radio (SSTV RX and TX)
+    match:
+      usb_vendor_id: "1209"
+      usb_product_id: "7388"
+      usb_serial: ""
+    endpoints:
+      # Empty values let the booth auto-detect the AIOC serial port and ALSA card.
+      serial: ""
+      audio_capture: plughw:CARD=AllInOneCable,DEV=0
+      audio_playback: plughw:CARD=AllInOneCable,DEV=0
+    options: {}
+
+  booth_pedal:
+    type: hid
+    description: PCsensor USB foot pedal
+    match: {}
+    endpoints:
+      hid: /dev/input/by-id/usb-PCsensor_FootSwitch-event-kbd
+    options: {}
+
+# slowrxd decodes receiver audio from the AIOC.
+hamstack_slowrxd_device: plughw:CARD=AllInOneCable,DEV=0
+hamstack_slowrxd_sample_rate: 48000
+# Used by playbooks/site.yml; the sstv-booth profile derives it from the booth port.
+hamstack_slowrxd_hook_url: http://127.0.0.1:8080/api/rx-event
+
+hamstack_sstv_booth_http_port: 8080
+hamstack_sstv_booth_interface: aioc_main
+hamstack_sstv_booth_trigger_device: booth_pedal
+hamstack_sstv_booth_trigger_key: KEY_B
+hamstack_sstv_booth_sstv_mode: Robot36
+hamstack_sstv_booth_blurb_mode: random
+hamstack_sstv_booth_blurb_list:
+  - Greetings from the Ham Radio Village
+  - Sent by SSTV over the air
+  - 73 from the booth
+# Leave disabled until the AIOC, PTT, radio audio level and a dry run are checked.
+hamstack_sstv_booth_tx_enabled: false
+hamstack_sstv_booth_tx_cooldown_s: 60
+hamstack_sstv_booth_max_tx_per_hour: 20

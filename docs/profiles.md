@@ -68,3 +68,14 @@ hamstack_profile_hamcube_openhamclock: false
 # Optional: point the kiosk at something other than local Gatus.
 hamstack_profile_hamcube_kiosk_url: https://conham.hamstack.home.arpa/
 ```
+
+## SSTV booth
+
+`playbooks/profiles/sstv-booth.yml` composes `digital/slowrxd`,
+`digital/sstv_booth`, and `desktop/kiosk` for a single-Pi event booth that shows
+received SSTV images and sends pedal-triggered selfies. The profile points the
+slowrxd hook and the kiosk at the booth's local port
+(`hamstack_sstv_booth_http_port`). Set `hamstack_profile_sstv_booth_kiosk: false`
+to skip the kiosk, or `hamstack_profile_sstv_booth_hook_url` to send hook events
+elsewhere. Transmission stays disabled until `hamstack_sstv_booth_tx_enabled` is
+set. See `inventory/example/host_vars/sstv-booth-node.yml`.

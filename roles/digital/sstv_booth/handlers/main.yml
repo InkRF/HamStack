@@ -1,0 +1,7 @@
+---
+- name: Restart SSTV booth
+  ansible.builtin.systemd:
+    name: hamstack-sstv-booth
+    state: restarted
+    daemon_reload: true
+  when: hamstack_sstv_booth_autostart | bool

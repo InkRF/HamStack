@@ -1,0 +1,22 @@
+---
+- name: Configure HamStack SSTV booth station profile
+  hosts: "{{ hamstack_profile_hosts | default('sstv_booth') }}"
+  become: true
+  roles:
+    - role: common
+    - role: digital/slowrxd
+      vars:
+        hamstack_slowrxd_enabled: true
+        hamstack_slowrxd_hook_url: >-
+          {{
+            hamstack_profile_sstv_booth_hook_url
+            | default('http://127.0.0.1:' ~ (hamstack_sstv_booth_http_port | default(8454) | string) ~ '/api/rx-event')
+          }}
+    - role: digital/sstv_booth
+      vars:
+        hamstack_sstv_booth_enabled: true
+    - role: desktop/kiosk
+      vars:
+        hamstack_kiosk_enabled: true
+        hamstack_kiosk_url: "{{ 'http://127.0.0.1:' ~ (hamstack_sstv_booth_http_port | default(8454) | string) ~ '/' }}"
+      when: hamstack_profile_sstv_booth_kiosk | default(true) | bool

@@ -1,0 +1,172 @@
+---
+- name: Manage SSTV booth
+  when: hamstack_sstv_booth_enabled | bool
+  block:
+    - name: Verify SSTV booth platform and inputs
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['os_family'] == "Debian"
+          - hamstack_sstv_booth_blurb_mode in ['fixed', 'random', 'none']
+          - hamstack_sstv_booth_sstv_mode in ['Robot36', 'MartinM1', 'ScottieS1']
+          - (hamstack_sstv_booth_tx_cooldown_s | float) >= 0
+          - (hamstack_sstv_booth_max_tx_per_hour | int) >= 1
+          - >-
+            not (hamstack_sstv_booth_tx_enabled | bool)
+            or hamstack_sstv_booth_callsign != 'N0CALL'
+        fail_msg: >-
+          The SSTV booth supports Debian-family Raspberry Pi systems. Check
+          blurb_mode (fixed|random|none), sstv_mode (Robot36|MartinM1|ScottieS1),
+          and TX limits. Enabling TX requires a real callsign.
+
+    - name: Create SSTV booth service group
+      ansible.builtin.group:
+        name: "{{ hamstack_sstv_booth_group }}"
+        system: true
+      when: hamstack_sstv_booth_manage_user | bool
+
+    - name: Create SSTV booth service account
+      ansible.builtin.user:
+        name: "{{ hamstack_sstv_booth_user }}"
+        group: "{{ hamstack_sstv_booth_group }}"
+        system: true
+        create_home: false
+        home: "{{ hamstack_sstv_booth_data_dir }}"
+        shell: /usr/sbin/nologin
+      when: hamstack_sstv_booth_manage_user | bool
+
+    - name: Verify SSTV booth service account exists
+      ansible.builtin.getent:
+        database: passwd
+        key: "{{ hamstack_sstv_booth_user }}"
+
+    - name: Add SSTV booth user to hardware groups
+      ansible.builtin.user:
+        name: "{{ hamstack_sstv_booth_user }}"
+        groups: "{{ hamstack_sstv_booth_user_groups }}"
+        append: true
+
+    - name: Install SSTV booth system packages
+      ansible.builtin.apt:
+        name:
+          - alsa-utils
+          - fonts-dejavu-core
+          - python3-evdev
+          - python3-fastapi
+          - python3-picamera2
+          - python3-pil
+          - python3-pip
+          - python3-serial
+          - python3-uvicorn
+          - python3-venv
+        state: present
+        update_cache: true
+        cache_valid_time: "{{ hamstack_common_apt_cache_valid_time | default(3600) }}"
+
+    - name: Create root-owned SSTV booth install directory
+      ansible.builtin.file:
+        path: "{{ hamstack_sstv_booth_install_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Create SSTV booth Python environment with system packages
+      ansible.builtin.command:
+        cmd: >-
+          python3 -m venv --system-site-packages
+          {{ hamstack_sstv_booth_venv_dir }}
+        creates: "{{ hamstack_sstv_booth_venv_dir }}/bin/python3"
+
+    - name: Install PySSTV in SSTV booth Python environment
+      ansible.builtin.pip:
+        name: pysstv
+        executable: "{{ hamstack_sstv_booth_venv_dir }}/bin/pip"
+
+    - name: Deploy SSTV booth application
+      ansible.builtin.copy:
+        src: sstv_booth
+        dest: "{{ hamstack_sstv_booth_install_dir }}/"
+        owner: root
+        group: root
+        mode: u=rwX,go=rX
+      notify: Restart SSTV booth
+
+    - name: Create SSTV booth data directories
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: directory
+        owner: "{{ hamstack_sstv_booth_user }}"
+        group: "{{ hamstack_sstv_booth_group }}"
+        mode: "0755"
+      loop:
+        - "{{ hamstack_sstv_booth_data_dir }}"
+        - "{{ hamstack_sstv_booth_data_dir }}/gallery"
+        - "{{ hamstack_sstv_booth_data_dir }}/work"
+
+    - name: Resolve configured SSTV booth devices
+      ansible.builtin.set_fact:
+        _hamstack_sstv_booth_aioc: >-
+          {{
+            hamstack_devices.get(hamstack_sstv_booth_interface, {})
+            if hamstack_sstv_booth_interface | length > 0
+            else {}
+          }}
+        _hamstack_sstv_booth_trigger: >-
+          {{
+            hamstack_devices.get(hamstack_sstv_booth_trigger_device, {})
+            if hamstack_sstv_booth_trigger_device | length > 0
+            else {}
+          }}
+
+    - name: Resolve SSTV booth hardware endpoints
+      ansible.builtin.set_fact:
+        _hamstack_sstv_booth_aioc_serial: >-
+          {{ _hamstack_sstv_booth_aioc.get('endpoints', {}).get('serial', '') }}
+        _hamstack_sstv_booth_aioc_audio: >-
+          {{ _hamstack_sstv_booth_aioc.get('endpoints', {}).get('audio_playback', '') }}
+        _hamstack_sstv_booth_trigger_device: >-
+          {{
+            _hamstack_sstv_booth_trigger.get('endpoints', {}).get('hid', '')
+            or hamstack_sstv_booth_trigger_fallback_device
+          }}
+
+    - name: Create HamStack configuration directory
+      ansible.builtin.file:
+        path: "{{ hamstack_config_dir | default('/etc/hamstack') }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Render SSTV booth configuration
+      ansible.builtin.template:
+        src: sstv_booth.json.j2
+        dest: "{{ (hamstack_config_dir | default('/etc/hamstack')) ~ '/sstv_booth.json' }}"
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart SSTV booth
+
+    - name: Install SSTV booth systemd service
+      ansible.builtin.template:
+        src: hamstack-sstv-booth.service.j2
+        dest: /etc/systemd/system/hamstack-sstv-booth.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart SSTV booth
+
+    - name: Enable and start SSTV booth
+      ansible.builtin.systemd:
+        name: hamstack-sstv-booth
+        enabled: true
+        state: started
+        daemon_reload: true
+      when: hamstack_sstv_booth_autostart | bool
+
+    - name: Disable SSTV booth autostart when requested
+      ansible.builtin.systemd:
+        name: hamstack-sstv-booth
+        enabled: false
+        daemon_reload: true
+      when: not (hamstack_sstv_booth_autostart | bool)

@@ -1,0 +1,141 @@
+---
+- name: Manage slowrxd
+  when: hamstack_slowrxd_enabled | bool
+  block:
+    - name: Verify slowrxd platform and inputs
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['os_family'] == "Debian"
+          - hamstack_slowrxd_channel in ['l', 'r', 'm']
+          - hamstack_slowrxd_device | length > 0
+          - (hamstack_slowrxd_sample_rate | int) <= 48000
+        fail_msg: >-
+          slowrxd supports Debian-family systems and requires an ALSA capture
+          device, a sample rate of at most 48000, and channel l, r, or m.
+
+    - name: Install slowrxd build and runtime packages
+      ansible.builtin.apt:
+        name:
+          - build-essential
+          - curl
+          - git
+          - libasound2-dev
+          - libfftw3-dev
+          - libgd-dev
+          - pkg-config
+        state: present
+        update_cache: true
+        cache_valid_time: "{{ hamstack_common_apt_cache_valid_time | default(3600) }}"
+
+    - name: Create slowrxd service group
+      ansible.builtin.group:
+        name: "{{ hamstack_slowrxd_group }}"
+        system: true
+      when: hamstack_slowrxd_manage_user | bool
+
+    - name: Create slowrxd service account
+      ansible.builtin.user:
+        name: "{{ hamstack_slowrxd_user }}"
+        group: "{{ hamstack_slowrxd_group }}"
+        groups: "{{ hamstack_slowrxd_user_groups }}"
+        append: true
+        system: true
+        create_home: false
+        home: "{{ hamstack_slowrxd_output_dir }}"
+        shell: /usr/sbin/nologin
+      when: hamstack_slowrxd_manage_user | bool
+
+    - name: Check out pinned slowrx source
+      ansible.builtin.git:
+        repo: "{{ hamstack_slowrxd_repo }}"
+        dest: "{{ hamstack_slowrxd_source_dir }}"
+        version: "{{ hamstack_slowrxd_version }}"
+        force: true
+
+    - name: Build slowrxd
+      ansible.builtin.shell:
+        cmd: >-
+          set -e;
+          rm -f .hamstack-built-*;
+          make clean;
+          make slowrxd;
+          touch .hamstack-built-{{ hamstack_slowrxd_version | quote }}
+        chdir: "{{ hamstack_slowrxd_source_dir }}"
+        creates: "{{ hamstack_slowrxd_source_dir }}/.hamstack-built-{{ hamstack_slowrxd_version }}"
+
+    - name: Install slowrxd binary
+      ansible.builtin.copy:
+        src: "{{ hamstack_slowrxd_source_dir }}/slowrxd"
+        dest: "{{ hamstack_slowrxd_install_path }}"
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0755"
+      notify: Restart slowrxd
+
+    - name: Create slowrxd output directory
+      ansible.builtin.file:
+        path: "{{ hamstack_slowrxd_output_dir }}"
+        state: directory
+        owner: "{{ hamstack_slowrxd_user }}"
+        group: "{{ hamstack_slowrxd_group }}"
+        mode: "0755"
+
+    - name: Create slowrxd hook directory
+      ansible.builtin.file:
+        path: "{{ hamstack_slowrxd_hook_path | dirname }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install slowrxd event hook
+      ansible.builtin.template:
+        src: slowrxd-hook.sh.j2
+        dest: "{{ hamstack_slowrxd_hook_path }}"
+        owner: root
+        group: root
+        mode: "0755"
+      when: hamstack_slowrxd_hook_url | length > 0
+
+    - name: Install slowrxd audio-retention rule
+      ansible.builtin.template:
+        src: hamstack-slowrxd.tmpfiles.j2
+        dest: /etc/tmpfiles.d/hamstack-slowrxd.conf
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Apply slowrxd tmpfiles rule
+
+    - name: Install slowrxd environment file
+      ansible.builtin.template:
+        src: hamstack-slowrxd.env.j2
+        dest: /etc/default/hamstack-slowrxd
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart slowrxd
+
+    - name: Install slowrxd systemd service
+      ansible.builtin.template:
+        src: hamstack-slowrxd.service.j2
+        dest: /etc/systemd/system/hamstack-slowrxd.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart slowrxd
+
+    - name: Enable and start slowrxd
+      ansible.builtin.systemd:
+        name: hamstack-slowrxd
+        enabled: true
+        state: started
+        daemon_reload: true
+      when: hamstack_slowrxd_autostart | bool
+
+    - name: Disable slowrxd autostart when requested
+      ansible.builtin.systemd:
+        name: hamstack-slowrxd
+        enabled: false
+        daemon_reload: true
+      when: not (hamstack_slowrxd_autostart | bool)

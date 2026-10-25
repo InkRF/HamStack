@@ -1,0 +1,48 @@
+---
+# Public configuration defaults for the sstv_booth HamStack role.
+# See docs/configuration.md for the configuration contract.
+hamstack_sstv_booth_enabled: false
+# Dedicated unprivileged service account. Do not reuse the Ansible automation
+# account; it typically holds passwordless sudo.
+hamstack_sstv_booth_user: hamstack-sstv-booth
+hamstack_sstv_booth_group: hamstack-sstv-booth
+hamstack_sstv_booth_manage_user: true
+hamstack_sstv_booth_user_groups:
+  - audio
+  - dialout
+  - video
+  - input
+hamstack_sstv_booth_install_dir: /opt/hamstack/sstv_booth
+hamstack_sstv_booth_venv_dir: /opt/hamstack/sstv_booth/venv
+hamstack_sstv_booth_data_dir: '{{ (hamstack_data_dir | default(''/var/lib/hamstack'')) ~ ''/sstv_booth'' }}'
+# Directory written by digital/slowrxd; the booth only reads it.
+hamstack_sstv_booth_rx_dir: >-
+  {{ hamstack_slowrxd_output_dir | default((hamstack_data_dir | default('/var/lib/hamstack')) ~ '/slowrxd') }}
+# The booth page is served to the local kiosk browser only.
+hamstack_sstv_booth_listen_address: 127.0.0.1
+hamstack_sstv_booth_http_port: 8454
+hamstack_sstv_booth_callsign: '{{ hamstack_callsign | default(''N0CALL'') }}'
+hamstack_sstv_booth_sstv_mode: Robot36
+# Top-of-image text: fixed uses blurb_text, random picks from blurb_list, none omits it.
+hamstack_sstv_booth_blurb_mode: fixed
+hamstack_sstv_booth_blurb_text: '{{ hamstack_event_name | default('''') }}'
+hamstack_sstv_booth_blurb_list: []
+hamstack_sstv_booth_tx_enabled: false
+hamstack_sstv_booth_tx_cooldown_s: 60
+hamstack_sstv_booth_max_tx_per_hour: 20
+hamstack_sstv_booth_rx_ignore_tail_s: 3
+hamstack_sstv_booth_countdown_s: 5
+hamstack_sstv_booth_review_s: 3
+hamstack_sstv_booth_interface: ''
+hamstack_sstv_booth_trigger_device: ''
+hamstack_sstv_booth_trigger_key: KEY_B
+hamstack_sstv_booth_trigger_fallback_device: /dev/input/by-id/usb-PCsensor_FootSwitch-event-kbd
+hamstack_sstv_booth_sample_rate: 48000
+hamstack_sstv_booth_cw_enabled: true
+hamstack_sstv_booth_cw_wpm: 15
+hamstack_sstv_booth_cw_tone_hz: 700.0
+hamstack_sstv_booth_ptt_lead_seconds: 0.30
+hamstack_sstv_booth_ptt_tail_seconds: 0.20
+hamstack_sstv_booth_camera_width: 1280
+hamstack_sstv_booth_camera_height: 720
+hamstack_sstv_booth_autostart: true

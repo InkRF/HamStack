@@ -1,0 +1,28 @@
+[Unit]
+Description=HamStack SSTV booth (kiosk app, selfie SSTV transmitter)
+After=network.target sound.target
+
+[Service]
+Type=simple
+User={{ hamstack_sstv_booth_user }}
+Group={{ hamstack_sstv_booth_group }}
+SupplementaryGroups={{ hamstack_sstv_booth_user_groups | join(' ') }}
+WorkingDirectory={{ hamstack_sstv_booth_data_dir }}
+Environment=PYTHONPATH={{ hamstack_sstv_booth_install_dir }}
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart={{ hamstack_sstv_booth_venv_dir }}/bin/python3 -m sstv_booth --config {{ (hamstack_config_dir | default('/etc/hamstack')) ~ '/sstv_booth.json' }}
+Restart=on-failure
+RestartSec=3
+# SIGTERM aborts playback and releases PTT before the HTTP server drains.
+TimeoutStopSec=15
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectControlGroups=yes
+RestrictSUIDSGID=yes
+ReadWritePaths={{ hamstack_sstv_booth_data_dir }}
+
+[Install]
+WantedBy=multi-user.target

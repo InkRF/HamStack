@@ -65,6 +65,7 @@ it owns.
 | SSTV receive appliance | `digital/sstv-rx` | Reference exercised; GQRX + HRV QSSTV receive path implemented |
 | SSTV workstation | `digital/sstv-workstation` | Implemented; detailed per-user audio/PTT preferences remain operator-configured |
 | SSTV Selfie Station | `digital/selfie_station` | Implemented; reference workflow exercised; TX disabled by default |
+| SSTV booth (receive display + pedal selfie TX) | `digital/slowrxd`, `digital/sstv_booth` | Implemented; repository and dev-mode tested, not yet hardware validated; TX disabled by default |
 | GridTracker2 | `visual/gridtracker` | Implemented; reference workstation exercised |
 | OpenWebRX | `visual/openwebrx` | Implemented container deployment |
 | OpenHamClock | `visual/openhamclock` | Implemented container deployment |
