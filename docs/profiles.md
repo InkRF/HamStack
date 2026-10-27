@@ -83,7 +83,7 @@ set. See `inventory/example/host_vars/sstv-booth-node.yml`.
 ## APRS kiosk
 
 `playbooks/profiles/aprs-kiosk.yml` composes `packet/graywolf`, `packet/aprs`,
-optional `digital/cw_practice`, and `desktop/kiosk` for a receive-only APRS
+optional `digital/morse-keyer`, and `desktop/kiosk` for a receive-only APRS
 display station. Graywolf decodes AFSK1200 from an AIOC. The example host_vars
 keep APRS simulation mode on with beaconing, digipeating, and IS-to-RF gating
 off, and leave the RF-to-IS iGate as an opt-in. The kiosk can rotate between the
@@ -94,7 +94,7 @@ Profile toggles:
 
 ```yaml
 hamstack_profile_aprs_kiosk_aprs: true    # packet/aprs policy on top of Graywolf
-hamstack_profile_aprs_kiosk_cw: false     # CW practice page and GPIO Morse key
+hamstack_profile_aprs_kiosk_cw: false     # Morse key bridge for hamvillage.org/morse-trainer
 hamstack_profile_aprs_kiosk_kiosk: true   # Chromium kiosk
 ```
 

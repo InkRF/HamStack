@@ -779,28 +779,35 @@ sends pedal-triggered selfies as SSTV. Transmission is disabled by default.
 The booth references shared AIOC and pedal resources from `hamstack_devices`; it
 does not own those devices. It does not set radio frequencies.
 
-<a id="role-cw-practice"></a>
-#### `cw_practice`
+<a id="role-morse-keyer"></a>
+#### `morse-keyer`
 
-Local CW practice page (sidetone, iambic or straight key, live decoder) and
-optional Raspberry Pi GPIO Morse-key input. Nothing is transmitted.
+Installs the HamRadioVillage morse-keyer GPIO bridge, which turns a Morse key,
+paddles, or keyer output on Raspberry Pi GPIO into key presses on a virtual
+keyboard for browser trainers such as hamvillage.org/morse-trainer. Nothing is
+transmitted.
 
 | Variable | Type | Default | Scope | Purpose |
 | --- | --- | --- | --- | --- |
-| `hamstack_cw_practice_enabled` | boolean | `false` | role | Install the CW practice page. |
-| `hamstack_cw_practice_install_dir` | path | `/opt/hamstack/cw_practice` | role | Static page directory, opened as `file://<dir>/index.html`. |
-| `hamstack_cw_practice_callsign` | string | site callsign | role | Callsign used in the page's suggested practice text. |
-| `hamstack_cw_practice_key_mode` | string | `iambic` | role | Default key mode: `iambic` (paddles) or `straight`. |
-| `hamstack_cw_practice_wpm` | integer | `15` | role | Default keyer speed (5-40 WPM). |
-| `hamstack_cw_practice_tone_hz` | integer | `600` | role | Sidetone pitch. |
-| `hamstack_cw_practice_dit_key` | string | `ControlLeft` | role | Browser `KeyboardEvent.code` treated as the dit paddle or straight key. |
-| `hamstack_cw_practice_dah_key` | string | `ControlRight` | role | Browser `KeyboardEvent.code` treated as the dah paddle. |
-| `hamstack_cw_practice_manage_gpio_key` | boolean | `false` | role | Manage `gpio-key` overlays for a Morse key in the Raspberry Pi boot configuration (reboot required). |
-| `hamstack_cw_practice_boot_config` | path | `/boot/firmware/config.txt` | role | Raspberry Pi firmware configuration file. |
-| `hamstack_cw_practice_tip_gpio` | integer | `17` | role | GPIO wired to the key's tip contact (active low, pull-up). |
-| `hamstack_cw_practice_ring_gpio` | integer | `27` | role | GPIO wired to the key's ring contact (active low, pull-up). |
-| `hamstack_cw_practice_tip_keycode` | integer | `29` | role | Linux keycode emitted by the tip contact (`KEY_LEFTCTRL`). |
-| `hamstack_cw_practice_ring_keycode` | integer | `97` | role | Linux keycode emitted by the ring contact (`KEY_RIGHTCTRL`). |
+| `hamstack_morse_keyer_enabled` | boolean | `false` | role | Install and run the Morse keyer bridge. |
+| `hamstack_morse_keyer_repo` | URL | `https://github.com/HamRadioVillage/morse-keyer.git` | role | Upstream source repository. |
+| `hamstack_morse_keyer_version` | git commit | `f57d95c982b0328ba7be38a470616688d979aeb7` | role | Pinned upstream commit. |
+| `hamstack_morse_keyer_source_dir` | path | `/opt/hamstack/morse-keyer` | role | Root-owned checkout the service runs from. |
+| `hamstack_morse_keyer_user` | string | `hamstack-morse-keyer` | role | Unprivileged service account. |
+| `hamstack_morse_keyer_group` | string | `hamstack-morse-keyer` | role | Primary group of the service account. |
+| `hamstack_morse_keyer_manage_user` | boolean | `true` | role | Create the service account/group as a nologin system user. |
+| `hamstack_morse_keyer_user_groups` | list[string] | `input`, `gpio` | role | Supplementary groups for `/dev/uinput` and GPIO access. |
+| `hamstack_morse_keyer_mode` | string | `straight` | role | `straight` (key or keyer output passed through) or `iambic` (paddles keyed by an on-Pi Curtis B keyer). |
+| `hamstack_morse_keyer_gpio` | integer | `17` | role | BCM GPIO for the straight key or dit paddle (tip). |
+| `hamstack_morse_keyer_dah_gpio` | integer | `27` | role | BCM GPIO for the dah paddle (ring); used only in `iambic` mode. |
+| `hamstack_morse_keyer_key` | string | `KEY_SPACE` | role | evdev key name pressed on the virtual keyboard. |
+| `hamstack_morse_keyer_bounce_ms` | number | `3` | role | Contact debounce applied to both edges (0-15 ms). |
+| `hamstack_morse_keyer_wpm` | number | `20` | role | Iambic keyer speed; keep near the trainer's speed. |
+| `hamstack_morse_keyer_boot_config` | path | `/boot/firmware/config.txt` | role | Boot configuration checked for conflicting `gpio-key` overlays. |
+| `hamstack_morse_keyer_autorepeat_user` | user/string | `hamstack_operator_user` | role | Desktop account whose X11 session gets auto-repeat turned off for the key; empty skips it. |
+| `hamstack_morse_keyer_x11_keycode` | integer | `65` | role | X11 keycode of the emitted key (evdev code + 8; 65 is Space). |
+| `hamstack_morse_keyer_autostart` | boolean | `true` | role | Enable and start the bridge service. |
+
 
 ### Voice
 

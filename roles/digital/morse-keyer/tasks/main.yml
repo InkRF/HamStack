@@ -1,0 +1,160 @@
+---
+- name: Manage Morse keyer bridge
+  when: hamstack_morse_keyer_enabled | bool
+  block:
+    - name: Verify Morse keyer inputs
+      ansible.builtin.assert:
+        that:
+          - ansible_facts['os_family'] == "Debian"
+          - hamstack_morse_keyer_mode in ['straight', 'iambic']
+          - hamstack_morse_keyer_key is match('^KEY_[A-Z0-9_]+$')
+          - (hamstack_morse_keyer_bounce_ms | float) >= 0
+          - (hamstack_morse_keyer_bounce_ms | float) <= 15
+          - (hamstack_morse_keyer_wpm | float) > 0
+          - >-
+            hamstack_morse_keyer_mode == 'straight'
+            or (hamstack_morse_keyer_gpio | int) != (hamstack_morse_keyer_dah_gpio | int)
+        fail_msg: >-
+          The Morse keyer supports Debian-family Raspberry Pi systems and needs
+          mode straight or iambic, an evdev key name such as KEY_SPACE, a
+          debounce of 0-15 ms, a positive WPM, and different dit/dah GPIOs in
+          iambic mode.
+
+    - name: Read Raspberry Pi boot configuration
+      ansible.builtin.slurp:
+        src: "{{ hamstack_morse_keyer_boot_config }}"
+      register: _hamstack_morse_keyer_boot_config
+      failed_when: false
+
+    - name: Refuse GPIO pins already claimed by a gpio-key overlay
+      ansible.builtin.assert:
+        that:
+          - >-
+            (_hamstack_morse_keyer_boot_config.content | default('') | b64decode)
+            is not search('(?m)^[ \t]*dtoverlay=gpio-key,(.*,)?gpio=' ~ (item | int | string) ~ '(,|$)')
+        fail_msg: >-
+          {{ hamstack_morse_keyer_boot_config }} has a dtoverlay=gpio-key line
+          for GPIO{{ item }}. Remove it and reboot; the kernel driver holds the
+          pin, so the keyer bridge cannot read it.
+      loop: >-
+        {{ [hamstack_morse_keyer_gpio]
+           + ([hamstack_morse_keyer_dah_gpio] if hamstack_morse_keyer_mode == 'iambic' else []) }}
+
+    - name: Install Morse keyer packages
+      ansible.builtin.apt:
+        name:
+          - git
+          - python3-evdev
+          - python3-gpiozero
+          - python3-lgpio
+          - x11-xserver-utils
+        state: present
+        update_cache: true
+        cache_valid_time: "{{ hamstack_common_apt_cache_valid_time | default(3600) }}"
+
+    - name: Create Morse keyer service group
+      ansible.builtin.group:
+        name: "{{ hamstack_morse_keyer_group }}"
+        system: true
+      when: hamstack_morse_keyer_manage_user | bool
+
+    - name: Create Morse keyer service account
+      ansible.builtin.user:
+        name: "{{ hamstack_morse_keyer_user }}"
+        group: "{{ hamstack_morse_keyer_group }}"
+        groups: "{{ hamstack_morse_keyer_user_groups }}"
+        append: true
+        system: true
+        create_home: false
+        home: /var/lib/hamstack-morse-keyer
+        shell: /usr/sbin/nologin
+      when: hamstack_morse_keyer_manage_user | bool
+
+    - name: Check out pinned morse-keyer source
+      ansible.builtin.git:
+        repo: "{{ hamstack_morse_keyer_repo }}"
+        dest: "{{ hamstack_morse_keyer_source_dir }}"
+        version: "{{ hamstack_morse_keyer_version }}"
+        force: true
+      notify: Restart morse keyer
+
+    - name: Load the uinput module at boot
+      ansible.builtin.copy:
+        dest: /etc/modules-load.d/hamstack-morse-keyer.conf
+        content: "uinput\n"
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Load the uinput module now
+      community.general.modprobe:
+        name: uinput
+        state: present
+
+    - name: Install upstream uinput udev rule
+      ansible.builtin.copy:
+        src: "{{ hamstack_morse_keyer_source_dir }}/99-morse-keyer.rules"
+        dest: /etc/udev/rules.d/99-morse-keyer.rules
+        remote_src: true
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Reload uinput udev rule
+
+    - name: Install Morse keyer systemd service
+      ansible.builtin.template:
+        src: hamstack-morse-keyer.service.j2
+        dest: /etc/systemd/system/hamstack-morse-keyer.service
+        owner: root
+        group: root
+        mode: "0644"
+      notify: Restart morse keyer
+
+    - name: Apply the uinput permissions before starting the service
+      ansible.builtin.meta: flush_handlers
+
+    - name: Enable and start Morse keyer
+      ansible.builtin.systemd:
+        name: hamstack-morse-keyer
+        enabled: true
+        state: started
+        daemon_reload: true
+      when: hamstack_morse_keyer_autostart | bool
+
+    - name: Disable Morse keyer autostart when requested
+      ansible.builtin.systemd:
+        name: hamstack-morse-keyer
+        enabled: false
+        daemon_reload: true
+      when: not (hamstack_morse_keyer_autostart | bool)
+
+    - name: Disable desktop auto-repeat for the Morse key
+      when: hamstack_morse_keyer_autorepeat_user | length > 0
+      block:
+        - name: Read auto-repeat desktop account
+          ansible.builtin.getent:
+            database: passwd
+            key: "{{ hamstack_morse_keyer_autorepeat_user }}"
+
+        - name: Read auto-repeat desktop account primary group
+          ansible.builtin.command:
+            cmd: "id -gn {{ hamstack_morse_keyer_autorepeat_user | quote }}"
+          register: _hamstack_morse_keyer_user_group
+          changed_when: false
+
+        - name: Create desktop autostart directory
+          ansible.builtin.file:
+            path: "{{ ansible_facts.getent_passwd[hamstack_morse_keyer_autorepeat_user][4] }}/.config/autostart"
+            state: directory
+            owner: "{{ hamstack_morse_keyer_autorepeat_user }}"
+            group: "{{ _hamstack_morse_keyer_user_group.stdout }}"
+            mode: "0755"
+
+        - name: Turn off X11 auto-repeat for the Morse key at login
+          ansible.builtin.template:
+            src: hamstack-morse-keyer-autorepeat.desktop.j2
+            dest: >-
+              {{ ansible_facts.getent_passwd[hamstack_morse_keyer_autorepeat_user][4] }}/.config/autostart/hamstack-morse-keyer-autorepeat.desktop
+            owner: "{{ hamstack_morse_keyer_autorepeat_user }}"
+            group: "{{ _hamstack_morse_keyer_user_group.stdout }}"
+            mode: "0644"

@@ -21,7 +21,7 @@ Set `hamstack_kiosk_urls` to open several pages as Chromium tabs (the single
 `hamstack-kiosk-rotate`, which sends `ctrl+Tab` to Chromium with `xdotool` on
 that interval. Rotation pauses while someone is using the keyboard or mouse and
 resumes after `hamstack_kiosk_rotate_idle_hold_s` seconds without local input,
-so a visitor using one page (for example a CW practice page) is not switched
+so a visitor using one page (for example a Morse trainer) is not switched
 away mid-session.
 
 Rotation requires an X11 session; `xdotool` cannot inject keys into a Wayland
@@ -31,5 +31,5 @@ the LightDM session is not already X11, and reports that a reboot is required.
 HamStack never reboots the host itself. On other distributions, select an X11
 session manually.
 
-Pages that need sound without a click (such as the CW practice sidetone) need
+Pages that need sound without a click (such as a Morse trainer sidetone) need
 `--autoplay-policy=no-user-gesture-required` in `hamstack_kiosk_browser_args`.

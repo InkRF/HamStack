@@ -11,9 +11,9 @@
       vars:
         hamstack_aprs_enabled: true
       when: hamstack_profile_aprs_kiosk_aprs | default(true) | bool
-    - role: digital/cw_practice
+    - role: digital/morse-keyer
       vars:
-        hamstack_cw_practice_enabled: true
+        hamstack_morse_keyer_enabled: true
       when: hamstack_profile_aprs_kiosk_cw | default(false) | bool
     - role: desktop/kiosk
       vars:

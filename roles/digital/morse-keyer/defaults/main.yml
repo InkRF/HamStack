@@ -1,0 +1,35 @@
+---
+# Public configuration defaults for the morse-keyer HamStack role.
+# See docs/configuration.md for the configuration contract.
+hamstack_morse_keyer_enabled: false
+hamstack_morse_keyer_repo: https://github.com/HamRadioVillage/morse-keyer.git
+# Pinned upstream commit. Change deliberately.
+hamstack_morse_keyer_version: f57d95c982b0328ba7be38a470616688d979aeb7
+hamstack_morse_keyer_source_dir: /opt/hamstack/morse-keyer
+# Dedicated unprivileged service account (uinput and GPIO access only).
+hamstack_morse_keyer_user: hamstack-morse-keyer
+hamstack_morse_keyer_group: hamstack-morse-keyer
+hamstack_morse_keyer_manage_user: true
+hamstack_morse_keyer_user_groups:
+  - input
+  - gpio
+# straight: key contact (or keyer output) passed through as the key.
+# iambic: paddles on gpio (dit) and dah_gpio (dah); a Curtis B keyer runs on the
+# Pi at hamstack_morse_keyer_wpm and sends timed key presses.
+hamstack_morse_keyer_mode: straight
+# BCM numbers: 17 is header pin 11 (tip), 27 is header pin 13 (ring).
+hamstack_morse_keyer_gpio: 17
+hamstack_morse_keyer_dah_gpio: 27
+# evdev key name; Space is what hamvillage.org/morse-trainer reads.
+hamstack_morse_keyer_key: KEY_SPACE
+hamstack_morse_keyer_bounce_ms: 3
+# Iambic only: keep near the trainer's own speed (20 WPM).
+hamstack_morse_keyer_wpm: 20
+hamstack_morse_keyer_boot_config: /boot/firmware/config.txt
+
+# Desktop auto-repeat turns a long held key into repeated presses. When set,
+# an XDG autostart entry for this desktop user runs `xset -r <keycode>` (X11).
+hamstack_morse_keyer_autorepeat_user: '{{ hamstack_operator_user | default('''') }}'
+# X11 keycode of the emitted key (evdev code + 8); 65 is Space.
+hamstack_morse_keyer_x11_keycode: 65
+hamstack_morse_keyer_autostart: true

@@ -48,7 +48,7 @@ validation.
 - `digital/selfie_station` — headless Picamera2/PySSTV/AIOC service with TX disabled by default.
 - `digital/slowrxd` — headless slowrxd SSTV receive daemon built from a pinned upstream commit, with an optional event hook.
 - `digital/sstv_booth` — FastAPI kiosk booth: slowrxd image display plus pedal-triggered Picamera2 selfie SSTV transmit with cooldown, hourly cap, and RX-busy guardrails; TX disabled by default.
-- `digital/cw_practice` — local CW practice page (sidetone, iambic/straight keying, decoder) with optional Raspberry Pi `gpio-key` Morse-key input.
+- `digital/morse-keyer` — HamRadioVillage morse-keyer GPIO-to-virtual-keyboard bridge (straight or iambic) installed at a pinned commit, with X11 auto-repeat turned off for the key.
 - `digital/sstv-rx` — GQRX + HamRadioVillage QSSTV receive appliance with managed Pulse/PipeWire-Pulse audio routing; exercised on the HRV reference receive appliance.
 - `digital/sstv-workstation` — general-purpose HRV QSSTV desktop workstation; detailed per-user audio/PTT preferences remain operator-managed.
 - `voice/allstar` — ASL3 node/radio/HTTP-registration configuration on a preinstalled upstream system; exercised on HRV reference hardware, with audio/radio calibration remaining site-specific.

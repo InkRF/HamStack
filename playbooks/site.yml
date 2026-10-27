@@ -89,8 +89,8 @@
       when: hamstack_slowrxd_enabled | default(false) | bool
     - role: digital/sstv_booth
       when: hamstack_sstv_booth_enabled | default(false) | bool
-    - role: digital/cw_practice
-      when: hamstack_cw_practice_enabled | default(false) | bool
+    - role: digital/morse-keyer
+      when: hamstack_morse_keyer_enabled | default(false) | bool
     - role: digital/sstv-rx
       when: hamstack_sstv_rx_enabled | default(false) | bool
     - role: digital/sstv-workstation

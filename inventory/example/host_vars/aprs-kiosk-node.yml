@@ -78,10 +78,12 @@ hamstack_aprs_igate_rf_to_is: true
 hamstack_kiosk_force_x11: true
 hamstack_kiosk_rotate_interval_s: 30
 hamstack_kiosk_rotate_idle_hold_s: 60
+# Rotation pauses while someone is keying and resumes after the idle hold.
+# For a CW-only day, list just the trainer and set rotate_interval_s to 0.
 hamstack_kiosk_urls:
+  # CW day: the Morse key presses Space, the trainer's key input (needs Internet).
+  - https://hamvillage.org/morse-trainer
   - http://127.0.0.1:8080/
-  # CW day: enable hamstack_profile_aprs_kiosk_cw and keep this page in the list.
-  - file:///opt/hamstack/cw_practice/index.html
   # Optional Internet map of nearby stations; replace with your own view.
   # - https://aprs.fi/
 hamstack_kiosk_browser_args:
@@ -89,11 +91,10 @@ hamstack_kiosk_browser_args:
   - --no-first-run
   - --disable-session-crashed-bubble
   - --disable-infobars
-  # Lets the CW practice sidetone play without a click.
+  # Lets the trainer's sidetone play without a click.
   - --autoplay-policy=no-user-gesture-required
 
-# CW practice day mode: Morse key on GPIO (tip -> GPIO17, ring -> GPIO27,
-# sleeve -> GND) mapped to left/right Ctrl. Reboot after the first run.
+# CW day mode: HamRadioVillage morse-keyer bridge. Wire tip -> GPIO17 (pin 11)
+# and sleeve -> GND (pin 9); ring -> GPIO27 (pin 13) only for iambic paddles.
 hamstack_profile_aprs_kiosk_cw: true
-hamstack_cw_practice_manage_gpio_key: true
-hamstack_cw_practice_key_mode: iambic
+hamstack_morse_keyer_mode: straight

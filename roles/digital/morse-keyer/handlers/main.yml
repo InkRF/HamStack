@@ -1,0 +1,12 @@
+---
+- name: Restart morse keyer
+  ansible.builtin.systemd:
+    name: hamstack-morse-keyer
+    state: restarted
+    daemon_reload: true
+  when: hamstack_morse_keyer_autostart | bool
+
+- name: Reload uinput udev rule
+  ansible.builtin.shell:
+    cmd: udevadm control --reload-rules && udevadm trigger --sysname-match=uinput
+  changed_when: true

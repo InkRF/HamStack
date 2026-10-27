@@ -134,25 +134,6 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_netlogger_package_url` | `` | Explicit upstream package URL override. |
 | `hamstack_netlogger_user` | `{{ hamstack_operator_user \| default('') }}` | Configuration value for netlogger user; see the desktop/netlogger role README for operational context. |
 
-## `digital/cw_practice`
-
-| Variable | Default | Purpose |
-| --- | --- | --- |
-| `hamstack_cw_practice_boot_config` | `/boot/firmware/config.txt` | Raspberry Pi firmware configuration file. |
-| `hamstack_cw_practice_callsign` | `{{ hamstack_callsign \| default('N0CALL') }}` | Callsign used in the page's suggested practice text. |
-| `hamstack_cw_practice_dah_key` | `ControlRight` | Browser `KeyboardEvent.code` treated as the dah paddle. |
-| `hamstack_cw_practice_dit_key` | `ControlLeft` | Browser `KeyboardEvent.code` treated as the dit paddle or straight key. |
-| `hamstack_cw_practice_enabled` | `false` | Install the CW practice page. |
-| `hamstack_cw_practice_install_dir` | `/opt/hamstack/cw_practice` | Static page directory, opened as `file://<dir>/index.html`. |
-| `hamstack_cw_practice_key_mode` | `iambic` | Default key mode: `iambic` (paddles) or `straight`. |
-| `hamstack_cw_practice_manage_gpio_key` | `false` | Manage `gpio-key` overlays for a Morse key in the Raspberry Pi boot configuration (reboot required). |
-| `hamstack_cw_practice_ring_gpio` | `27` | GPIO wired to the key's ring contact (active low, pull-up). |
-| `hamstack_cw_practice_ring_keycode` | `97` | Linux keycode emitted by the ring contact (`KEY_RIGHTCTRL`). |
-| `hamstack_cw_practice_tip_gpio` | `17` | GPIO wired to the key's tip contact (active low, pull-up). |
-| `hamstack_cw_practice_tip_keycode` | `29` | Linux keycode emitted by the tip contact (`KEY_LEFTCTRL`). |
-| `hamstack_cw_practice_tone_hz` | `600` | Sidetone pitch. |
-| `hamstack_cw_practice_wpm` | `15` | Default keyer speed (5-40 WPM). |
-
 ## `digital/fldigi`
 
 | Variable | Default | Purpose |
@@ -218,6 +199,29 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_js8call_version` | `3.0.3` | Requested upstream software version. |
 | `hamstack_js8call_x86_64_checksum` | `sha256:3f89bd821f281c59a9384c08a3ad783ea3b9ac6abf319ce6c0d881c2ecc6e6cd` | Configuration value for js8call x86 64 checksum; see the digital/js8call role README for operational context. |
 | `hamstack_js8call_x86_64_url` | `https://github.com/JS8Call-improved/JS8Call-improved/releases/download/v{{ hamstack_js8call_version }}/JS8C...` | Configuration value for js8call x86 64 url; see the digital/js8call role README for operational context. |
+
+## `digital/morse-keyer`
+
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `hamstack_morse_keyer_autorepeat_user` | `{{ hamstack_operator_user \| default('') }}` | Desktop account whose X11 session gets auto-repeat turned off for the key; empty skips it. |
+| `hamstack_morse_keyer_autostart` | `true` | Enable and start the bridge service. |
+| `hamstack_morse_keyer_boot_config` | `/boot/firmware/config.txt` | Boot configuration checked for conflicting `gpio-key` overlays. |
+| `hamstack_morse_keyer_bounce_ms` | `3` | Contact debounce applied to both edges (0-15 ms). |
+| `hamstack_morse_keyer_dah_gpio` | `27` | BCM GPIO for the dah paddle (ring); used only in `iambic` mode. |
+| `hamstack_morse_keyer_enabled` | `false` | Install and run the Morse keyer bridge. |
+| `hamstack_morse_keyer_gpio` | `17` | BCM GPIO for the straight key or dit paddle (tip). |
+| `hamstack_morse_keyer_group` | `hamstack-morse-keyer` | Primary group of the service account. |
+| `hamstack_morse_keyer_key` | `KEY_SPACE` | evdev key name pressed on the virtual keyboard. |
+| `hamstack_morse_keyer_manage_user` | `true` | Create the service account/group as a nologin system user. |
+| `hamstack_morse_keyer_mode` | `straight` | `straight` (key or keyer output passed through) or `iambic` (paddles keyed by an on-Pi Curtis B keyer). |
+| `hamstack_morse_keyer_repo` | `https://github.com/HamRadioVillage/morse-keyer.git` | Upstream source repository. |
+| `hamstack_morse_keyer_source_dir` | `/opt/hamstack/morse-keyer` | Root-owned checkout the service runs from. |
+| `hamstack_morse_keyer_user` | `hamstack-morse-keyer` | Unprivileged service account. |
+| `hamstack_morse_keyer_user_groups` | `[input, gpio]` | Supplementary groups for `/dev/uinput` and GPIO access. |
+| `hamstack_morse_keyer_version` | `f57d95c982b0328ba7be38a470616688d979aeb7` | Pinned upstream commit. |
+| `hamstack_morse_keyer_wpm` | `20` | Iambic keyer speed; keep near the trainer's speed. |
+| `hamstack_morse_keyer_x11_keycode` | `65` | X11 keycode of the emitted key (evdev code + 8; 65 is Space). |
 
 ## `digital/multimon-ng`
 

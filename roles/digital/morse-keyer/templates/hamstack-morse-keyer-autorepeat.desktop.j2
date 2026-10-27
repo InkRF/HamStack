@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=HamStack Morse key auto-repeat off
+Comment=Managed by HamStack (digital/morse-keyer)
+Exec=xset -r {{ hamstack_morse_keyer_x11_keycode | int }}
+Terminal=false
+X-GNOME-Autostart-enabled=true
