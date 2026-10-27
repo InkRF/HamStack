@@ -43,7 +43,6 @@
     - name: Install Morse keyer packages
       ansible.builtin.apt:
         name:
-          - git
           - python3-evdev
           - python3-gpiozero
           - python3-lgpio
@@ -70,12 +69,21 @@
         shell: /usr/sbin/nologin
       when: hamstack_morse_keyer_manage_user | bool
 
-    - name: Check out pinned morse-keyer source
-      ansible.builtin.git:
-        repo: "{{ hamstack_morse_keyer_repo }}"
-        dest: "{{ hamstack_morse_keyer_source_dir }}"
-        version: "{{ hamstack_morse_keyer_version }}"
-        force: true
+    - name: Create root-owned Morse keyer install directory
+      ansible.builtin.file:
+        path: "{{ hamstack_morse_keyer_install_dir }}"
+        state: directory
+        owner: root
+        group: root
+        mode: "0755"
+
+    - name: Install Morse keyer bridge
+      ansible.builtin.copy:
+        src: morse_keyer.py
+        dest: "{{ hamstack_morse_keyer_install_dir }}/morse_keyer.py"
+        owner: root
+        group: root
+        mode: "0755"
       notify: Restart morse keyer
 
     - name: Load the uinput module at boot
@@ -91,11 +99,10 @@
         name: uinput
         state: present
 
-    - name: Install upstream uinput udev rule
+    - name: Install uinput udev rule
       ansible.builtin.copy:
-        src: "{{ hamstack_morse_keyer_source_dir }}/99-morse-keyer.rules"
+        src: 99-morse-keyer.rules
         dest: /etc/udev/rules.d/99-morse-keyer.rules
-        remote_src: true
         owner: root
         group: root
         mode: "0644"

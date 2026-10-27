@@ -782,7 +782,7 @@ does not own those devices. It does not set radio frequencies.
 <a id="role-morse-keyer"></a>
 #### `morse-keyer`
 
-Installs the HamRadioVillage morse-keyer GPIO bridge, which turns a Morse key,
+Deploys the HamRadioVillage morse-keyer GPIO bridge (bundled in the role), which turns a Morse key,
 paddles, or keyer output on Raspberry Pi GPIO into key presses on a virtual
 keyboard for browser trainers such as hamvillage.org/morse-trainer. Nothing is
 transmitted.
@@ -790,9 +790,7 @@ transmitted.
 | Variable | Type | Default | Scope | Purpose |
 | --- | --- | --- | --- | --- |
 | `hamstack_morse_keyer_enabled` | boolean | `false` | role | Install and run the Morse keyer bridge. |
-| `hamstack_morse_keyer_repo` | URL | `https://github.com/HamRadioVillage/morse-keyer.git` | role | Upstream source repository. |
-| `hamstack_morse_keyer_version` | git commit | `f57d95c982b0328ba7be38a470616688d979aeb7` | role | Pinned upstream commit. |
-| `hamstack_morse_keyer_source_dir` | path | `/opt/hamstack/morse-keyer` | role | Root-owned checkout the service runs from. |
+| `hamstack_morse_keyer_install_dir` | path | `/opt/hamstack/morse-keyer` | role | Root-owned directory for the bundled `morse_keyer.py`. |
 | `hamstack_morse_keyer_user` | string | `hamstack-morse-keyer` | role | Unprivileged service account. |
 | `hamstack_morse_keyer_group` | string | `hamstack-morse-keyer` | role | Primary group of the service account. |
 | `hamstack_morse_keyer_manage_user` | boolean | `true` | role | Create the service account/group as a nologin system user. |

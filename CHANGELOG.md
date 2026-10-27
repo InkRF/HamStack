@@ -19,8 +19,8 @@ releases when needed to establish a durable public contract.
 - `playbooks/profiles/sstv-booth.yml`, `scripts/sstv-booth-install.sh`
   (no-Ansible fallback), and `scripts/sstv-loopback-test.sh` (snd-aloop
   receive-path test).
-- `digital/morse-keyer`: installs the HamRadioVillage morse-keyer bridge at a
-  pinned commit, so a Morse key, paddles, or keyer output on Raspberry Pi GPIO
+- `digital/morse-keyer`: deploys the HamRadioVillage morse-keyer bridge
+  (bundled with permission), so a Morse key, paddles, or keyer output on Raspberry Pi GPIO
   presses Space for browser trainers such as hamvillage.org/morse-trainer.
 - `desktop/kiosk`: optional multi-URL tabs with idle-aware `xdotool` tab
   rotation, and an opt-in Raspberry Pi OS X11 session switch.

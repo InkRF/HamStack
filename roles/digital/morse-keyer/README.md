@@ -1,20 +1,20 @@
 # `morse-keyer` role
 
-> **Status:** implemented install of the HamRadioVillage morse-keyer GPIO bridge; not yet hardware validated.
+> **Status:** implemented HamRadioVillage morse-keyer GPIO bridge; not yet hardware validated.
 
 ## Purpose
 
 Let visitors key a browser Morse trainer such as
 <https://hamvillage.org/morse-trainer> with a real key, paddles, or a keyer's
-output. The role installs [HamRadioVillage/morse-keyer](https://github.com/HamRadioVillage/morse-keyer),
+output. The role deploys the bridge from
+[HamRadioVillage/morse-keyer](https://github.com/HamRadioVillage/morse-keyer),
 which reads a key on Raspberry Pi GPIO and presses a key (Space by default) on a
 virtual keyboard through `/dev/uinput`. Nothing is transmitted.
 
 ## Expected starting state
 
 Raspberry Pi OS (Debian-family) on a Raspberry Pi with a desktop session for
-the trainer, normally `desktop/kiosk`. Internet access is needed on the first
-run to clone the upstream source.
+the trainer, normally `desktop/kiosk`.
 
 ## Wiring
 
@@ -40,10 +40,9 @@ keyer's transistor output pulling the line to ground) presses the key. A mono
 
 ## Responsibilities
 
-- Clone `hamstack_morse_keyer_repo` at the pinned `hamstack_morse_keyer_version`
-  into `hamstack_morse_keyer_source_dir` (root-owned) and install the
-  upstream `99-morse-keyer.rules` udev rule, which gives the `input` group
-  access to `/dev/uinput`.
+- Install the bundled `morse_keyer.py` into `hamstack_morse_keyer_install_dir`
+  (root-owned) and the `99-morse-keyer.rules` udev rule, which gives the
+  `input` group access to `/dev/uinput`.
 - Load `uinput` at boot and run `morse_keyer.py` as the unprivileged
   `hamstack-morse-keyer` account (groups `input`, `gpio`) under
   `hamstack-morse-keyer.service`.
@@ -54,14 +53,18 @@ keyer's transistor output pulling the line to ground) presses the key. A mono
   holding a long dah makes the desktop send repeated key presses. Wayland
   sessions ignore `xset`; use an X11 session (see `desktop/kiosk`).
 
-HamStack renders the service unit, the `modules-load.d` entry, and the
-autostart entry authoritatively.
+HamStack renders the program, udev rule, service unit, `modules-load.d` entry,
+and autostart entry authoritatively.
 
-## Upstream licensing
+## Provenance
 
-The upstream repository does not currently carry a license file, so HamStack
-does not copy its code. The role installs it from GitHub at a pinned commit on
-the target host.
+`files/morse_keyer.py` and `files/99-morse-keyer.rules` are copied unmodified
+from HamRadioVillage/morse-keyer at commit
+`f57d95c982b0328ba7be38a470616688d979aeb7`, with the permission of
+HamRadioVillage, and are distributed as part of HamStack under the GNU GPL v3.
+Behaviour is adapted through command-line options in the service unit rather
+than by editing the program. To update, copy the files from a newer upstream
+commit and record that commit here.
 
 ## Configuration
 

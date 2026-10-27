@@ -212,14 +212,12 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_morse_keyer_enabled` | `false` | Install and run the Morse keyer bridge. |
 | `hamstack_morse_keyer_gpio` | `17` | BCM GPIO for the straight key or dit paddle (tip). |
 | `hamstack_morse_keyer_group` | `hamstack-morse-keyer` | Primary group of the service account. |
+| `hamstack_morse_keyer_install_dir` | `/opt/hamstack/morse-keyer` | Root-owned directory for the bundled `morse_keyer.py`. |
 | `hamstack_morse_keyer_key` | `KEY_SPACE` | evdev key name pressed on the virtual keyboard. |
 | `hamstack_morse_keyer_manage_user` | `true` | Create the service account/group as a nologin system user. |
 | `hamstack_morse_keyer_mode` | `straight` | `straight` (key or keyer output passed through) or `iambic` (paddles keyed by an on-Pi Curtis B keyer). |
-| `hamstack_morse_keyer_repo` | `https://github.com/HamRadioVillage/morse-keyer.git` | Upstream source repository. |
-| `hamstack_morse_keyer_source_dir` | `/opt/hamstack/morse-keyer` | Root-owned checkout the service runs from. |
 | `hamstack_morse_keyer_user` | `hamstack-morse-keyer` | Unprivileged service account. |
 | `hamstack_morse_keyer_user_groups` | `[input, gpio]` | Supplementary groups for `/dev/uinput` and GPIO access. |
-| `hamstack_morse_keyer_version` | `f57d95c982b0328ba7be38a470616688d979aeb7` | Pinned upstream commit. |
 | `hamstack_morse_keyer_wpm` | `20` | Iambic keyer speed; keep near the trainer's speed. |
 | `hamstack_morse_keyer_x11_keycode` | `65` | X11 keycode of the emitted key (evdev code + 8; 65 is Space). |
 
