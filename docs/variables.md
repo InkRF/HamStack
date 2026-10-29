@@ -117,6 +117,7 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_kiosk_rotate_idle_hold_s` | `60` | Configuration value for kiosk rotate idle hold s; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_rotate_interval_s` | `0` | Configuration value for kiosk rotate interval s; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_rotation` | `normal` | Configuration value for kiosk rotation; see the desktop/kiosk role README for operational context. |
+| `hamstack_kiosk_touch_device` | `` | Configuration value for kiosk touch device; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_url` | `https://127.0.0.1/` | Configuration value for kiosk url; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_urls` | `[]` | Configuration value for kiosk urls; see the desktop/kiosk role README for operational context. |
 | `hamstack_kiosk_user` | `{{ hamstack_operator_user \| default('') }}` | Configuration value for kiosk user; see the desktop/kiosk role README for operational context. |

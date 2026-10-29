@@ -9,6 +9,9 @@ hamstack_kiosk_disable_blanking: true
 hamstack_kiosk_hide_cursor: true
 hamstack_kiosk_rotation: normal
 hamstack_kiosk_output: ''
+# xinput name of a touchscreen to rotate with hamstack_kiosk_rotation
+# (see `DISPLAY=:0 xinput list`). Empty leaves touch input unchanged.
+hamstack_kiosk_touch_device: ''
 hamstack_kiosk_browser_args:
   - --kiosk
   - --no-first-run

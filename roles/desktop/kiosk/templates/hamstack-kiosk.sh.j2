@@ -13,6 +13,13 @@ if command -v xrandr >/dev/null 2>&1; then
   xrandr --output {{ hamstack_kiosk_output | quote }} --rotate {{ hamstack_kiosk_rotation | quote }} || true
 fi
 {% endif %}
+{% if hamstack_kiosk_touch_device | length > 0 %}
+# xrandr rotates the picture only; turn the touch panel to match.
+if command -v xinput >/dev/null 2>&1; then
+  xinput set-prop {{ hamstack_kiosk_touch_device | quote }} 'Coordinate Transformation Matrix' \
+    {{ {'normal': '1 0 0 0 1 0 0 0 1', 'left': '0 -1 1 1 0 0 0 0 1', 'right': '0 1 0 -1 0 1 0 0 1', 'inverted': '-1 0 1 0 -1 1 0 0 1'}[hamstack_kiosk_rotation] }} || true
+fi
+{% endif %}
 {% if hamstack_kiosk_hide_cursor %}
 if command -v unclutter >/dev/null 2>&1; then
   unclutter -idle 0.5 -root >/dev/null 2>&1 &

@@ -33,3 +33,22 @@ session manually.
 
 Pages that need sound without a click (such as a Morse trainer sidetone) need
 `--autoplay-policy=no-user-gesture-required` in `hamstack_kiosk_browser_args`.
+
+## Display and touch rotation
+
+`hamstack_kiosk_rotation` (`normal`, `left`, `right`, `inverted`) rotates
+`hamstack_kiosk_output` with `xrandr` when the kiosk starts; find the output name
+with `DISPLAY=:0 xrandr`. `xrandr` does not rotate touch input, so set
+`hamstack_kiosk_touch_device` to the touchscreen's `xinput` name (see
+`DISPLAY=:0 xinput list`) to apply the matching coordinate transformation at the
+same time. For example, a Raspberry Pi Touch Display 2 used in landscape:
+
+```yaml
+hamstack_kiosk_output: DSI-1
+hamstack_kiosk_rotation: left
+hamstack_kiosk_touch_device: 10-005d Goodix Capacitive TouchScreen
+```
+
+Both settings are X11-only and are applied each time the kiosk launches.
+Rotation set through a Wayland desktop's screen settings does not carry over to
+an X11 session.

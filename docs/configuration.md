@@ -983,7 +983,8 @@ and network appliances.
   them with `xdotool` (X11 only), pausing for `hamstack_kiosk_rotate_idle_hold_s`
   after local keyboard or mouse input. `hamstack_kiosk_force_x11` switches a
   Raspberry Pi OS desktop to X11 with `raspi-config` and reports that a reboot is
-  needed.
+  needed. `hamstack_kiosk_rotation` with `hamstack_kiosk_output` rotates the
+  display, and `hamstack_kiosk_touch_device` rotates a touchscreen to match.
 - `desktop/chirp` installs CHIRP-next for radio programming;
   `hamstack_chirp_wheel_checksum` verifies the wheel path.
 - `desktop/netlogger` installs an operator-supplied NetLogger Debian package;

@@ -18,6 +18,7 @@
         name: >-
           {{ [hamstack_kiosk_browser_package, 'x11-xserver-utils', 'unclutter']
              + (['xdotool', 'xprintidle'] if (hamstack_kiosk_rotate_interval_s | int) > 0 else [])
+             + (['xinput'] if hamstack_kiosk_touch_device | length > 0 else [])
              + hamstack_kiosk_extra_packages }}
         state: present
         update_cache: true
