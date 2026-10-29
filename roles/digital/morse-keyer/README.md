@@ -18,16 +18,32 @@ the trainer, normally `desktop/kiosk`.
 
 ## Wiring
 
-| Plug contact | Straight key / keyer output | Paddles (`iambic`) | Raspberry Pi |
-| --- | --- | --- | --- |
-| Tip | contact | dit | GPIO17 (pin 11) |
-| Ring | — | dah | GPIO27 (pin 13) |
-| Sleeve | common | common | GND (pin 9) |
+Connect the key to the 40-pin GPIO header through a 3.5 mm TRS breakout jack:
 
-The GPIOs use the internal pull-ups; closing a contact to the sleeve (or a
-keyer's transistor output pulling the line to ground) presses the key. A mono
-(TS) plug in a stereo jack shorts the ring to the sleeve, which is harmless in
-`straight` mode but sends continuous dahs in `iambic` mode.
+| Breakout contact | Straight key / keyer output | Paddles (`iambic`) | Raspberry Pi header |
+| --- | --- | --- | --- |
+| Tip | key | dit | GPIO17 (physical pin 11) |
+| Ring | — | dah (optional) | GPIO27 (physical pin 13) |
+| Sleeve | common | common | GND (physical pin 9) |
+
+**Do not plug the key into the Pi's onboard 3.5 mm audio/video jack.** That
+jack is output-only (stereo audio plus composite video) and is not connected to
+any header GPIO, so a key there can never be read. It can still carry sidetone
+audio out.
+
+**Never connect the key to 3.3 V or 5 V.** The key only shorts a GPIO to
+ground. The GPIOs use the SoC's internal pull-ups, so an open contact reads
+high (key up) and a closed contact, or a keyer's transistor output pulling the
+line to ground, reads low (key down). No external resistors are needed.
+
+The key pins are set with `hamstack_morse_keyer_gpio` (default 17) and, for
+paddles, `hamstack_morse_keyer_dah_gpio` (default 27). Contact debounce is
+applied equally to press and release (`hamstack_morse_keyer_bounce_ms`, default
+5 ms). Much longer debounce clips fast CW: a dit at 20 WPM is 60 ms.
+
+A mono (TS) plug in a stereo breakout jack shorts the ring to the sleeve, which
+is harmless in `straight` mode (the ring is never read) but sends continuous
+dahs in `iambic` mode.
 
 ## Modes
 

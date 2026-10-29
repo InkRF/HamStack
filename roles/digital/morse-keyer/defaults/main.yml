@@ -16,12 +16,16 @@ hamstack_morse_keyer_user_groups:
 # iambic: paddles on gpio (dit) and dah_gpio (dah); a Curtis B keyer runs on the
 # Pi at hamstack_morse_keyer_wpm and sends timed key presses.
 hamstack_morse_keyer_mode: straight
-# BCM numbers: 17 is header pin 11 (tip), 27 is header pin 13 (ring).
+# BCM numbers on the 40-pin header (via a TRS breakout, not the onboard audio
+# jack): 17 is physical pin 11 (tip), 27 is physical pin 13 (ring). Inputs use
+# the internal pull-up; LOW (contact to GND) is key down.
 hamstack_morse_keyer_gpio: 17
 hamstack_morse_keyer_dah_gpio: 27
 # evdev key name; Space is what hamvillage.org/morse-trainer reads.
 hamstack_morse_keyer_key: KEY_SPACE
-hamstack_morse_keyer_bounce_ms: 3
+# Contact debounce applied equally to press and release. Keep it near 5 ms;
+# much longer clips fast CW (a dit at 20 WPM is 60 ms).
+hamstack_morse_keyer_bounce_ms: 5
 # Iambic only: keep near the trainer's own speed (20 WPM).
 hamstack_morse_keyer_wpm: 20
 hamstack_morse_keyer_boot_config: /boot/firmware/config.txt

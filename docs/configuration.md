@@ -784,8 +784,10 @@ does not own those devices. It does not set radio frequencies.
 
 Deploys the HamRadioVillage morse-keyer GPIO bridge (bundled in the role), which turns a Morse key,
 paddles, or keyer output on Raspberry Pi GPIO into key presses on a virtual
-keyboard for browser trainers such as hamvillage.org/morse-trainer. Nothing is
-transmitted.
+keyboard for browser trainers such as hamvillage.org/morse-trainer. The key
+connects to the GPIO header through a TRS breakout (tip GPIO17 pin 11, ring
+GPIO27 pin 13, sleeve GND pin 9), never to the onboard audio jack, which is
+output-only. Nothing is transmitted.
 
 | Variable | Type | Default | Scope | Purpose |
 | --- | --- | --- | --- | --- |
@@ -796,10 +798,10 @@ transmitted.
 | `hamstack_morse_keyer_manage_user` | boolean | `true` | role | Create the service account/group as a nologin system user. |
 | `hamstack_morse_keyer_user_groups` | list[string] | `input`, `gpio` | role | Supplementary groups for `/dev/uinput` and GPIO access. |
 | `hamstack_morse_keyer_mode` | string | `straight` | role | `straight` (key or keyer output passed through) or `iambic` (paddles keyed by an on-Pi Curtis B keyer). |
-| `hamstack_morse_keyer_gpio` | integer | `17` | role | BCM GPIO for the straight key or dit paddle (tip). |
-| `hamstack_morse_keyer_dah_gpio` | integer | `27` | role | BCM GPIO for the dah paddle (ring); used only in `iambic` mode. |
+| `hamstack_morse_keyer_gpio` | integer | `17` | role | BCM GPIO for the straight key or dit paddle (tip, physical pin 11), wired through a TRS breakout to the header; internal pull-up, LOW is key down. |
+| `hamstack_morse_keyer_dah_gpio` | integer | `27` | role | BCM GPIO for the dah paddle (ring, physical pin 13); used only in `iambic` mode. |
 | `hamstack_morse_keyer_key` | string | `KEY_SPACE` | role | evdev key name pressed on the virtual keyboard. |
-| `hamstack_morse_keyer_bounce_ms` | number | `3` | role | Contact debounce applied to both edges (0-15 ms). |
+| `hamstack_morse_keyer_bounce_ms` | number | `5` | role | Contact debounce applied to both edges (0-15 ms); much longer clips fast CW. |
 | `hamstack_morse_keyer_wpm` | number | `20` | role | Iambic keyer speed; keep near the trainer's speed. |
 | `hamstack_morse_keyer_boot_config` | path | `/boot/firmware/config.txt` | role | Boot configuration checked for conflicting `gpio-key` overlays. |
 | `hamstack_morse_keyer_autorepeat_user` | user/string | `hamstack_operator_user` | role | Desktop account whose X11 session gets auto-repeat turned off for the key; empty skips it. |

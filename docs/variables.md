@@ -208,10 +208,10 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_morse_keyer_autorepeat_user` | `{{ hamstack_operator_user \| default('') }}` | Desktop account whose X11 session gets auto-repeat turned off for the key; empty skips it. |
 | `hamstack_morse_keyer_autostart` | `true` | Enable and start the bridge service. |
 | `hamstack_morse_keyer_boot_config` | `/boot/firmware/config.txt` | Boot configuration checked for conflicting `gpio-key` overlays. |
-| `hamstack_morse_keyer_bounce_ms` | `3` | Contact debounce applied to both edges (0-15 ms). |
-| `hamstack_morse_keyer_dah_gpio` | `27` | BCM GPIO for the dah paddle (ring); used only in `iambic` mode. |
+| `hamstack_morse_keyer_bounce_ms` | `5` | Contact debounce applied to both edges (0-15 ms); much longer clips fast CW. |
+| `hamstack_morse_keyer_dah_gpio` | `27` | BCM GPIO for the dah paddle (ring, physical pin 13); used only in `iambic` mode. |
 | `hamstack_morse_keyer_enabled` | `false` | Install and run the Morse keyer bridge. |
-| `hamstack_morse_keyer_gpio` | `17` | BCM GPIO for the straight key or dit paddle (tip). |
+| `hamstack_morse_keyer_gpio` | `17` | BCM GPIO for the straight key or dit paddle (tip, physical pin 11), wired through a TRS breakout to the header; internal pull-up, LOW is key down. |
 | `hamstack_morse_keyer_group` | `hamstack-morse-keyer` | Primary group of the service account. |
 | `hamstack_morse_keyer_install_dir` | `/opt/hamstack/morse-keyer` | Root-owned directory for the bundled `morse_keyer.py`. |
 | `hamstack_morse_keyer_key` | `KEY_SPACE` | evdev key name pressed on the virtual keyboard. |

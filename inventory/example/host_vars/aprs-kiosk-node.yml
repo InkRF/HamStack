@@ -94,7 +94,9 @@ hamstack_kiosk_browser_args:
   # Lets the trainer's sidetone play without a click.
   - --autoplay-policy=no-user-gesture-required
 
-# CW day mode: HamRadioVillage morse-keyer bridge. Wire tip -> GPIO17 (pin 11)
-# and sleeve -> GND (pin 9); ring -> GPIO27 (pin 13) only for iambic paddles.
+# CW day mode: HamRadioVillage morse-keyer bridge. Wire the key through a 3.5 mm
+# TRS breakout to the GPIO header (not the Pi's onboard audio jack, which is
+# output-only): tip -> GPIO17 (pin 11), sleeve -> GND (pin 9), and
+# ring -> GPIO27 (pin 13) only for iambic paddles. Never wire the key to 3.3 V/5 V.
 hamstack_profile_aprs_kiosk_cw: true
 hamstack_morse_keyer_mode: straight
