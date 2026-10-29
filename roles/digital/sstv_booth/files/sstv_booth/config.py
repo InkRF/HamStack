@@ -42,6 +42,7 @@ class Config:
     pedal_key: str = "KEY_B"
     camera_width: int = 1280
     camera_height: int = 720
+    camera_rotation: int = 0  # 0 or 180
     preview_width: int = 640
     preview_height: int = 360
 
@@ -80,4 +81,6 @@ def load_config(path: str | None, dev: bool = False) -> Config:
         config.dev = True
     if config.blurb_mode not in ("fixed", "random", "none"):
         raise ValueError(f"blurb_mode must be fixed, random or none, not {config.blurb_mode!r}")
+    if config.camera_rotation not in (0, 180):
+        raise ValueError(f"camera_rotation must be 0 or 180, not {config.camera_rotation!r}")
     return config

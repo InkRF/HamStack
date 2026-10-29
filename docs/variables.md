@@ -364,6 +364,7 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_sstv_booth_blurb_text` | `{{ hamstack_event_name \| default('') }}` | Text used by `fixed` blurb mode. |
 | `hamstack_sstv_booth_callsign` | `{{ hamstack_callsign \| default('N0CALL') }}` | Callsign overlaid on every image and sent as the CW ID. |
 | `hamstack_sstv_booth_camera_height` | `720` | Capture stream height. |
+| `hamstack_sstv_booth_camera_rotation` | `0` | Camera image rotation, `0` or `180` (for an upside-down mount); applied to the preview and the transmitted photo. |
 | `hamstack_sstv_booth_camera_width` | `1280` | Capture stream width. |
 | `hamstack_sstv_booth_countdown_s` | `5` | Countdown over the live preview before capture. |
 | `hamstack_sstv_booth_cw_enabled` | `true` | Prefix transmissions with a software-generated CW callsign ID. |

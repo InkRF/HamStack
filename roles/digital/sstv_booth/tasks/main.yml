@@ -10,13 +10,15 @@
           - hamstack_sstv_booth_sstv_mode in ['Robot36', 'MartinM1', 'ScottieS1']
           - (hamstack_sstv_booth_tx_cooldown_s | float) >= 0
           - (hamstack_sstv_booth_max_tx_per_hour | int) >= 1
+          - (hamstack_sstv_booth_camera_rotation | int) in [0, 180]
           - >-
             not (hamstack_sstv_booth_tx_enabled | bool)
             or hamstack_sstv_booth_callsign != 'N0CALL'
         fail_msg: >-
           The SSTV booth supports Debian-family Raspberry Pi systems. Check
           blurb_mode (fixed|random|none), sstv_mode (Robot36|MartinM1|ScottieS1),
-          and TX limits. Enabling TX requires a real callsign.
+          TX limits, and camera_rotation (0|180). Enabling TX requires a real
+          callsign.
 
     - name: Create SSTV booth service group
       ansible.builtin.group:

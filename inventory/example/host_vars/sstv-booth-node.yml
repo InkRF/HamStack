@@ -57,6 +57,8 @@ hamstack_sstv_booth_interface: aioc_main
 hamstack_sstv_booth_trigger_device: booth_pedal
 hamstack_sstv_booth_trigger_key: KEY_B
 hamstack_sstv_booth_sstv_mode: Robot36
+# 180 when the camera is mounted upside down.
+hamstack_sstv_booth_camera_rotation: 0
 hamstack_sstv_booth_blurb_mode: random
 hamstack_sstv_booth_blurb_list:
   - Greetings from the Ham Radio Village

@@ -38,14 +38,19 @@ class PiCamera:
         self._camera = None
 
     def start(self) -> None:
+        from libcamera import Transform
         from picamera2 import Picamera2
         from picamera2.encoders import MJPEGEncoder
         from picamera2.outputs import FileOutput
 
         camera = Picamera2()
+        # 180 degrees is a horizontal plus vertical flip, applied by the ISP to
+        # both the capture stream and the preview.
+        flip = int(self.config.camera_rotation == 180)
         configuration = camera.create_video_configuration(
             main={"size": (self.config.camera_width, self.config.camera_height), "format": "RGB888"},
             lores={"size": (self.config.preview_width, self.config.preview_height)},
+            transform=Transform(hflip=flip, vflip=flip),
         )
         camera.configure(configuration)
         try:

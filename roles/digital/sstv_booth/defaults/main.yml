@@ -45,4 +45,6 @@ hamstack_sstv_booth_ptt_lead_seconds: 0.30
 hamstack_sstv_booth_ptt_tail_seconds: 0.20
 hamstack_sstv_booth_camera_width: 1280
 hamstack_sstv_booth_camera_height: 720
+# 0 or 180; use 180 for a camera mounted upside down.
+hamstack_sstv_booth_camera_rotation: 0
 hamstack_sstv_booth_autostart: true

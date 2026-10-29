@@ -183,6 +183,15 @@ class ConfigTests(unittest.TestCase):
         finally:
             Path(handle.name).unlink()
 
+    def test_camera_rotation_limited_to_0_or_180(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False) as handle:
+            handle.write('{"camera_rotation": 90}')
+        try:
+            with self.assertRaises(ValueError):
+                load_config(handle.name)
+        finally:
+            Path(handle.name).unlink()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -774,6 +774,7 @@ sends pedal-triggered selfies as SSTV. Transmission is disabled by default.
 | `hamstack_sstv_booth_ptt_tail_seconds` | number | `0.20` | role | Delay after playback before unkeying PTT. |
 | `hamstack_sstv_booth_camera_width` | integer | `1280` | role | Capture stream width. |
 | `hamstack_sstv_booth_camera_height` | integer | `720` | role | Capture stream height. |
+| `hamstack_sstv_booth_camera_rotation` | integer | `0` | role | Camera image rotation, `0` or `180` (for an upside-down mount); applied to the preview and the transmitted photo. |
 | `hamstack_sstv_booth_autostart` | boolean | `true` | role | Enable and start the booth service. |
 
 The booth references shared AIOC and pedal resources from `hamstack_devices`; it
