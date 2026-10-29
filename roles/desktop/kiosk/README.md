@@ -41,7 +41,8 @@ Pages that need sound without a click (such as a Morse trainer sidetone) need
 with `DISPLAY=:0 xrandr`. `xrandr` does not rotate touch input, so set
 `hamstack_kiosk_touch_device` to the touchscreen's `xinput` name (see
 `DISPLAY=:0 xinput list`) to apply the matching coordinate transformation at the
-same time. For example, a Raspberry Pi Touch Display 2 used in landscape:
+same time. For example, a Goodix-based DSI touchscreen (such as the Raspberry Pi Touch
+Display 2 or Waveshare 7inch DSI Touch) used in landscape:
 
 ```yaml
 hamstack_kiosk_output: DSI-1
@@ -49,6 +50,8 @@ hamstack_kiosk_rotation: left
 hamstack_kiosk_touch_device: 10-005d Goodix Capacitive TouchScreen
 ```
 
+The launcher selects the `pointer:` device of that name, because touch
+controllers often also register a keyboard device with the same name.
 Both settings are X11-only and are applied each time the kiosk launches.
 Rotation set through a Wayland desktop's screen settings does not carry over to
 an X11 session.

@@ -14,9 +14,11 @@ if command -v xrandr >/dev/null 2>&1; then
 fi
 {% endif %}
 {% if hamstack_kiosk_touch_device | length > 0 %}
-# xrandr rotates the picture only; turn the touch panel to match.
+# xrandr rotates the picture only; turn the touch panel to match. Touch
+# controllers often register as both a pointer and a keyboard with the same
+# name, so the pointer device is selected explicitly.
 if command -v xinput >/dev/null 2>&1; then
-  xinput set-prop {{ hamstack_kiosk_touch_device | quote }} 'Coordinate Transformation Matrix' \
+  xinput set-prop {{ (hamstack_kiosk_touch_device if hamstack_kiosk_touch_device is match('^(pointer|keyboard):') else 'pointer:' ~ hamstack_kiosk_touch_device) | quote }} 'Coordinate Transformation Matrix' \
     {{ {'normal': '1 0 0 0 1 0 0 0 1', 'left': '0 -1 1 1 0 0 0 0 1', 'right': '0 1 0 -1 0 1 0 0 1', 'inverted': '-1 0 1 0 -1 1 0 0 1'}[hamstack_kiosk_rotation] }} || true
 fi
 {% endif %}
