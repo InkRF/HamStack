@@ -13,6 +13,15 @@ hamstack_hostname: sstv-booth-node
 # Desktop login that runs the Chromium kiosk (desktop autologin is operator-managed).
 hamstack_operator_user: operator
 
+# Portrait-native DSI touchscreen (Goodix controller) used in landscape. Display
+# and touch rotation are X11-only, so the desktop session is switched to X11
+# (reboot after the first run). Check names with `DISPLAY=:0 xrandr` and
+# `DISPLAY=:0 xinput list`.
+hamstack_kiosk_force_x11: true
+hamstack_kiosk_output: DSI-1
+hamstack_kiosk_rotation: left
+hamstack_kiosk_touch_device: 10-005d Goodix Capacitive TouchScreen
+
 hamstack_devices:
   aioc_main:
     type: aioc
@@ -36,8 +45,9 @@ hamstack_devices:
       hid: /dev/input/by-id/usb-PCsensor_FootSwitch-event-kbd
     options: {}
 
-# slowrxd decodes receiver audio from the AIOC.
-hamstack_slowrxd_device: plughw:CARD=AllInOneCable,DEV=0
+# slowrxd decodes receiver audio from the AIOC. It takes the ALSA card name
+# (bracketed in `arecord -l`), not a PCM string.
+hamstack_slowrxd_device: All-In-One-Cable
 hamstack_slowrxd_sample_rate: 48000
 # Used by playbooks/site.yml; the sstv-booth profile derives it from the booth port.
 hamstack_slowrxd_hook_url: http://127.0.0.1:8080/api/rx-event

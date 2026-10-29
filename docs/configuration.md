@@ -723,7 +723,7 @@ Headless SSTV receive daemon built from a pinned commit of the upstream
 | `hamstack_slowrxd_group` | string | `hamstack-slowrxd` | role | Primary group of the service account. |
 | `hamstack_slowrxd_manage_user` | boolean | `true` | role | Create the service account/group as a nologin system user. |
 | `hamstack_slowrxd_user_groups` | list[string] | `audio` | role | Supplementary groups granting ALSA capture access. |
-| `hamstack_slowrxd_device` | string | `plughw:CARD=AllInOneCable,DEV=0` | role | ALSA capture PCM carrying receiver audio. |
+| `hamstack_slowrxd_device` | string | `All-In-One-Cable` | role | ALSA card name (bracketed in `arecord -l`) or `default`; slowrxd opens device 0 of that card. PCM strings such as `plughw:...` are rejected. |
 | `hamstack_slowrxd_sample_rate` | integer | `48000` | role | Capture sample rate (slowrxd clamps above 48000). |
 | `hamstack_slowrxd_channel` | string | `l` | role | Capture channel: `l`, `r`, or `m` (mono). |
 | `hamstack_slowrxd_output_dir` | path | `<hamstack_data_dir>/slowrxd` | role | Directory for in-progress and final images, logs, and audio dumps. |

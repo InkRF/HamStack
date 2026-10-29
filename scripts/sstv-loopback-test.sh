@@ -29,8 +29,9 @@ BOOTH_CONFIG=/etc/hamstack/sstv_booth.json
 SLOWRXD_BIN=/usr/local/bin/slowrxd
 BOOTH_INSTALL=/opt/hamstack/sstv_booth
 TEST_UNIT=hamstack-slowrxd-loopback
-LOOP_PLAY="plughw:CARD=Loopback,DEV=0,SUBDEV=0"
-LOOP_CAPTURE="plughw:CARD=Loopback,DEV=1,SUBDEV=0"
+# slowrxd takes a card name and captures from device 0, so play into device 1.
+LOOP_PLAY="plughw:CARD=Loopback,DEV=1,SUBDEV=0"
+LOOP_CAPTURE="Loopback"
 
 for path in "$ENV_FILE" "$BOOTH_CONFIG" "$SLOWRXD_BIN" "$BOOTH_INSTALL/venv/bin/python3"; do
   [ -e "$path" ] || { echo "FAIL: $path not found; deploy slowrxd and sstv_booth first." >&2; exit 1; }

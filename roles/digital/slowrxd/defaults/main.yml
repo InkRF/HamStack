@@ -14,8 +14,10 @@ hamstack_slowrxd_group: hamstack-slowrxd
 hamstack_slowrxd_manage_user: true
 hamstack_slowrxd_user_groups:
   - audio
-# ALSA capture PCM. The AIOC enumerates as card "AllInOneCable".
-hamstack_slowrxd_device: plughw:CARD=AllInOneCable,DEV=0
+# ALSA card name (the bracketed name in `arecord -l`) or "default". slowrxd
+# matches it against the card name and opens device 0 of that card; it does not
+# accept PCM strings such as plughw:CARD=...
+hamstack_slowrxd_device: All-In-One-Cable
 hamstack_slowrxd_sample_rate: 48000
 # slowrxd channel selector: l (left), r (right), or m (mono).
 hamstack_slowrxd_channel: l

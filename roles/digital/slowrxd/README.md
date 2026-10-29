@@ -15,7 +15,7 @@ for any unattended SSTV receive/archive node.
 ## Expected starting state
 
 A Debian-family host with an ALSA capture device carrying receiver audio, such
-as an AIOC (`plughw:CARD=AllInOneCable,DEV=0`). Internet access is needed on the
+as an AIOC (card name `All-In-One-Cable`). Internet access is needed on the
 first run to clone the upstream source.
 
 ## Responsibilities
@@ -56,6 +56,10 @@ immediately. Only the event name and the image basename are forwarded.
 
 ## Upstream behavior worth knowing
 
+- `-p` takes an ALSA card *name* (the bracketed name in `arecord -l`, such as
+  `All-In-One-Cable`) or `default`, not a PCM string. slowrxd opens `hw:<card>`
+  device 0 directly, so `plughw:` conversion is not available; an unmatched
+  name exits with "Device disconnected?".
 - `-I`, `-L`, and `-A` paths are resolved against `-d` only when `-d` appears
   first on the command line; the unit always passes `-d` first and leaves those
   paths at their defaults.

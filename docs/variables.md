@@ -297,7 +297,7 @@ This is the exhaustive index of `hamstack_*` variables currently declared by the
 | `hamstack_slowrxd_audio_retention` | `1d` | systemd-tmpfiles age for per-image `.au` audio dumps. |
 | `hamstack_slowrxd_autostart` | `true` | Enable and start the slowrxd service. |
 | `hamstack_slowrxd_channel` | `l` | Capture channel: `l`, `r`, or `m` (mono). |
-| `hamstack_slowrxd_device` | `plughw:CARD=AllInOneCable,DEV=0` | ALSA capture PCM carrying receiver audio. |
+| `hamstack_slowrxd_device` | `All-In-One-Cable` | ALSA card name (bracketed in `arecord -l`) or `default`; slowrxd opens device 0 of that card. PCM strings such as `plughw:...` are rejected. |
 | `hamstack_slowrxd_enabled` | `false` | Build, install, and run slowrxd. |
 | `hamstack_slowrxd_extra_args` | `[]` | Additional slowrxd arguments, such as `-F` or `-S`. |
 | `hamstack_slowrxd_group` | `hamstack-slowrxd` | Primary group of the service account. |

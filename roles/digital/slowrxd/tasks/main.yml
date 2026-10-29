@@ -8,10 +8,13 @@
           - ansible_facts['os_family'] == "Debian"
           - hamstack_slowrxd_channel in ['l', 'r', 'm']
           - hamstack_slowrxd_device | length > 0
+          - "':' not in hamstack_slowrxd_device"
           - (hamstack_slowrxd_sample_rate | int) <= 48000
         fail_msg: >-
-          slowrxd supports Debian-family systems and requires an ALSA capture
-          device, a sample rate of at most 48000, and channel l, r, or m.
+          slowrxd supports Debian-family systems and requires an ALSA card name
+          (as shown in brackets by `arecord -l`, for example All-In-One-Cable,
+          not a PCM string such as plughw:...), a sample rate of at most 48000,
+          and channel l, r, or m.
 
     - name: Install slowrxd build and runtime packages
       ansible.builtin.apt:

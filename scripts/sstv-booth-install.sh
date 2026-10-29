@@ -12,7 +12,8 @@
 # Options:
 #   --callsign CALL      Station callsign (required)
 #   --port PORT          Booth HTTP port on 127.0.0.1 (default 8080)
-#   --device PCM         ALSA capture/playback device (default plughw:CARD=AllInOneCable,DEV=0)
+#   --device PCM         ALSA playback device for TX (default plughw:CARD=AllInOneCable,DEV=0)
+#   --rx-card NAME       ALSA card name slowrxd captures from (default All-In-One-Cable)
 #   --pedal PATH         Foot-pedal input device (default PCsensor by-id path)
 #   --blurb TEXT         Fixed top-of-image text (default none)
 #   --kiosk-user USER    Desktop user that gets a Chromium kiosk autostart entry
@@ -36,13 +37,14 @@ BOOTH_CONFIG=/etc/hamstack/sstv_booth.json
 CALLSIGN=""
 PORT=8080
 DEVICE="plughw:CARD=AllInOneCable,DEV=0"
+RX_CARD=All-In-One-Cable
 PEDAL=/dev/input/by-id/usb-PCsensor_FootSwitch-event-kbd
 BLURB=""
 KIOSK_USER=""
 TX_ENABLED=false
 
 usage() {
-  sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
+  sed -n '2,21p' "$0" | sed 's/^# \{0,1\}//'
   exit "${1:-0}"
 }
 
@@ -51,6 +53,7 @@ while [ $# -gt 0 ]; do
     --callsign) CALLSIGN="${2:?}"; shift 2 ;;
     --port) PORT="${2:?}"; shift 2 ;;
     --device) DEVICE="${2:?}"; shift 2 ;;
+    --rx-card) RX_CARD="${2:?}"; shift 2 ;;
     --pedal) PEDAL="${2:?}"; shift 2 ;;
     --blurb) BLURB="${2:?}"; shift 2 ;;
     --kiosk-user) KIOSK_USER="${2:?}"; shift 2 ;;
@@ -135,7 +138,7 @@ EOF
 
 cat > /etc/default/hamstack-slowrxd <<EOF
 SLOWRXD_OUTPUT_DIR=$RX_DIR
-SLOWRXD_DEVICE=$DEVICE
+SLOWRXD_DEVICE=$RX_CARD
 SLOWRXD_SAMPLE_RATE=48000
 SLOWRXD_CHANNEL=l
 SLOWRXD_HOOK_ARGS="-x $SLOWRXD_HOOK"
