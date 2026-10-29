@@ -40,7 +40,7 @@ done
 # shellcheck disable=SC1090
 . "$ENV_FILE"
 SLOWRXD_USER="$(systemctl show -p User --value hamstack-slowrxd)"
-BOOTH_URL="$(python3 -c 'import json,sys; c=json.load(open(sys.argv[1])); print(f"http://127.0.0.1:{c[\"http_port\"]}")' "$BOOTH_CONFIG")"
+BOOTH_URL="$(python3 -c 'import json,sys; c=json.load(open(sys.argv[1])); print("http://127.0.0.1:%d" % c["http_port"])' "$BOOTH_CONFIG")"
 
 gallery_rx_names() {
   curl -fsS -m 5 "$BOOTH_URL/api/gallery?limit=200" \
