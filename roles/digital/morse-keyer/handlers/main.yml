@@ -1,12 +1,14 @@
 ---
+# Handlers run in file order: apply the uinput permissions before (re)starting
+# the bridge, or the first start can fail to open /dev/uinput.
+- name: Reload uinput udev rule
+  ansible.builtin.shell:
+    cmd: udevadm control --reload-rules && udevadm trigger --sysname-match=uinput && udevadm settle
+  changed_when: true
+
 - name: Restart morse keyer
   ansible.builtin.systemd:
     name: hamstack-morse-keyer
     state: restarted
     daemon_reload: true
   when: hamstack_morse_keyer_autostart | bool
-
-- name: Reload uinput udev rule
-  ansible.builtin.shell:
-    cmd: udevadm control --reload-rules && udevadm trigger --sysname-match=uinput
-  changed_when: true

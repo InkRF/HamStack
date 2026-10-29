@@ -10,6 +10,8 @@ SupplementaryGroups={{ hamstack_morse_keyer_user_groups | join(' ') }}
 # gpiozero's lgpio backend writes notification files into its working directory.
 StateDirectory=hamstack-morse-keyer
 WorkingDirectory=/var/lib/hamstack-morse-keyer
+# Show the bridge's startup line in the journal immediately.
+Environment=PYTHONUNBUFFERED=1
 ExecStart=/usr/bin/python3 {{ hamstack_morse_keyer_install_dir }}/morse_keyer.py --mode {{ hamstack_morse_keyer_mode }} --gpio {{ hamstack_morse_keyer_gpio | int }} --dah-gpio {{ hamstack_morse_keyer_dah_gpio | int }} --key {{ hamstack_morse_keyer_key }} --bounce-ms {{ hamstack_morse_keyer_bounce_ms }} --wpm {{ hamstack_morse_keyer_wpm }}
 Restart=on-failure
 RestartSec=2
